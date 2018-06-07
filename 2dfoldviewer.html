@@ -283,7 +283,6 @@
           if(fold.faces_edges[i][j] in intersections){
             newFaceVertices[currentFace].push(fold.faces_vertices[i][j]);
             var firstEdge = (fold.edges_vertices[edgesToNewEdges[fold.faces_edges[i][j]][0]][0] == fold.faces_vertices[i][j]) ? 0 : 1;
-            console.log(firstEdge + " " + edgesToNewEdges[fold.faces_edges[i][j]] + " " + fold.faces_vertices[i][j]);
             newFaceEdges[currentFace].push(edgesToNewEdges[fold.faces_edges[i][j]][firstEdge]);
             newFaceVertices[currentFace].push(edgesToNewVertex[fold.faces_edges[i][j]]);
             if(currentFace == 0){
@@ -323,7 +322,6 @@
           var line = perpendicularOfLineThroughPoint(m, fold.vertices_coords[i][0], fold.vertices_coords[i][1]);
           var x = (line[1] - b)/(m - line[0]);
           var y = x * line[0] + line[1];
-          console.log(x - (fold.vertices_coords[i][0] - x) + " " + x + " " + y + " " + line + " " + fold.vertices_coords[i]);
           fold.vertices_coords[i][0] = x - (fold.vertices_coords[i][0] - x);
           fold.vertices_coords[i][1] = y - (fold.vertices_coords[i][1] - y);
         }
