@@ -338,7 +338,12 @@
 
     function perpendicularBisectorOfSegment(fromX, fromY, xCord, yCord){
       var m1 = (fromY - yCord) / (fromX - xCord);
-      m1 = -1/m1;
+      if(m1 == 0){
+        m1 = Infinity;
+      }
+      else{
+        m1 = -1/m1;
+      }
       var b1 = (yCord + fromY)/ 2 - m1 * (fromX + xCord) / 2;
       return [m1, b1];
     }
