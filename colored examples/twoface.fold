@@ -1,0 +1,50 @@
+{
+"file_version": 1,
+"file_creator": "A text editor",
+"file_author": "Rob",
+"file_class": "foldedForm",
+"frame_attributes": ["2D"],
+"frame_title": "Rob's twoface",
+"vertices_coords": [
+	[0,600],
+	[600,600],
+	[600,0],
+	[0,0],
+	[0,300],
+	[600,300]
+],
+"faces_vertices": [
+	[0,1,2,3],
+	[4,5,2,3]
+],
+"faces_edges": [
+	[0,1,2,3],
+	[4,5,6,7]
+],
+"edges_vertices": [
+	[0,1],
+	[1,2],
+	[2,3],
+	[3,0],
+	[4,5],
+	[5,2],
+	[2,3],
+	[3,4]
+],
+"edges_assignment": [
+	"B",
+	"B",
+	"M",
+	"B",
+	"B",
+	"B",
+	"B",
+	"B"
+],
+"faceOrders": [
+	[1,0,1]
+],
+"colors": [
+
+]
+}

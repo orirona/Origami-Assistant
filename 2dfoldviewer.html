@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang = "en">
+<head>
+  <meta charset = "UTF-8">
+  <title>Origami Assistant</title>
+</head>
+<body>
+  <input type="file" id="fileInput" name="foldFile" accept=".fold"/>
+  <div>
+  <svg version="1.1"
+     baseProfile="full"
+     width="600" height="600"
+     xmlns="http://www.w3.org/2000/svg"
+     id="svg">
+  <rect x="0" y="0" width="600" height="600" fill="none" stroke="black" stroke-width = "16"/>
+  <script>
+    var vertexIndex = 0;
+    var silhouette = [];
+    var fold, foldBackup;
+    document.getElementById('fileInput').addEventListener('change', selectFile, false);
+    function selectFile(evt) {
+      var file = evt.target.files[0];
+      vertexIndex = 0;
+      silhouette = [];
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var text = reader.result;
+        fold = JSON.parse(text);
+        foldBackup = JSON.parse(JSON.stringify(fold)); 
+        initFoldFile(fold);
+        var history = [];
+        silhouette = makeSilhouette(fold);
+        draw(fold, document.getElementsByTagName('svg')[0]);
+        drawHighlight(0);
+      }
+      reader.readAsText(file);
+    }
+
+    document.onkeypress = function (evt) {
+      if(evt.charCode === 110){
+        ++vertexIndex;
+        drawHighlight(vertexIndex % silhouette.length);
+      }
+    };
+
+    document.onmousedown = function(evt){
+      function onmousemove(evt) {
+        fold = JSON.parse(JSON.stringify(foldBackup));
+        silhouette = makeSilhouette(fold);
+        foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
+        draw(fold, document.getElementsByTagName('svg')[0]);   
+      }
+      document.addEventListener('mousemove', onmousemove);
+      document.onmouseup = function() {
+        foldBackup = JSON.parse(JSON.stringify(fold));
+        document.removeEventListener('mousemove', onmousemove);
+      };
+    };
+
+    // document.onmouseup = function(evt){
+    //   foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
+    //   foldBackup = JSON.parse(JSON.stringify(fold)); 
+    //   silhouette = makeSilhouette(fold);
+    //   draw(fold, document.getElementsByTagName('svg')[0]);
+    // };
+
+    function draw(fold, svg) {  
+      while(svg.lastChild) {
+        svg.removeChild(svg.lastChild);
+      }
+      var vertices = fold.vertices_coords;
+      //assumes they are sorted
+      var faces = fold.faces_vertices;
+      for(var i = 0; i < faces.length; ++i){
+        var d = "";
+        for(var j = 0; j < faces[i].length; ++j){
+          var location = vertices[faces[i][j]][0] + " " + vertices[faces[i][j]][1];
+          if(d === ""){
+            d = "M" + location + " ";
+          }
+          else{
+            d += "L" + location + " ";
+          }
+        }  
+        appendPath(d, i, svg, fold.colors[i]);
+      }
+      appendFrame(svg);
+    }
+
+    function initFoldFile(fold){
+      if(fold.colors === []){
+        for(var i = 0; i < fold.faces_vertices.length; ++i){
+          fold.colors.push(false);
+        } 
+      } 
+    }
+
+    function appendPath(d, i, svg, color){
+        var path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+        path.setAttribute("d",d);
+        path.setAttribute("fill", "rgb(" + (128) + (color ? 0 : 120) + "," + (223) + "," + (color ? 255 : 120) + ")");
+        path.setAttribute("stroke-alignment", "inner");
+        path.setAttribute("stroke-width", "2");
+        path.setAttribute("stroke", "black");
+        svg.appendChild(path);
+    }
+
+    function appendFrame(svg){
+        var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+        rect.setAttribute("x", 0);
+        rect.setAttribute("y", 0);
+        rect.setAttribute("width", 600);
+        rect.setAttribute("height", 600);
+        rect.setAttribute("fill", "none");
+        rect.setAttribute("stroke", "black");
+        rect.setAttribute("stroke-width", "16");
+        svg.appendChild(rect);
+    }
+
+    function translate(xShift, yShift, fold) {
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
+        fold.vertices_coords[i][0] += xShift;
+        fold.vertices_coords[i][1] += yShift;
+      }
+    }
+
+    function scale(factor, fold) {
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
+        fold.vertices_coords[i][0] *= factor;
+        fold.vertices_coords[i][1] *= factor;
+      }
+    }
+
+    function flip(fold, history){
+      history.push(fold);
+      for(var i = 0; i < fold.colors.length; ++i){
+        fold.colors[i] = !fold.colors[i];
+      }
+      fold.faces_vertices.reverse();
+    }
+    
+    function foldEdgeToEdge(indexEdgeOne, indexEdgeTwo, fold, history){
+      
+    }
+
+    function edgeAngle(indexEdge, fold){
+      x1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][0];
+      y1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][1];
+      x2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
+      y2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
+      var angle = Math.atan((y1 - y2)/(x2 - x1));
+      angle *= 180/Math.PI;
+    }
+
+    function isParrallelEdges(indexEdge1, indexEdge2, fold){
+      var EPS = .05;
+      return Math.abs(edgeAngle(indexEdge1, fold) - edgeAngle(indexEdge2, fold)) < EPS;
+    }
+
+    function makeSilhouette(fold){
+      var visited = [];
+      var silhouette = [];
+      for(var i = 0; i < fold.faces_vertices.length; ++i){
+        for(var j = 0; j < fold.faces_vertices[i].length; ++j){
+          var vertex = fold.faces_vertices[i][j];
+          if(!visited.includes(vertex) && !contains(silhouette, fold.vertices_coords[vertex])){
+            if(!pointInFace(vertex, i, fold)){
+              silhouette.push(fold.vertices_coords[vertex]);
+            }
+            visited.push(vertex);
+          }
+        }
+      }
+      var centerX = findRoughCenter(silhouette)[0];
+      var centerY = findRoughCenter(silhouette)[1];
+      silhouette.sort(function(a, b){
+        if(findAngle(centerX, centerY, a[0], a[1]) > findAngle(centerX, centerY, b[0], b[1])){
+          return 1;
+        }  
+        return -1;
+      });
+      return silhouette;
+    }
+
+    function pointInFace(vertex, face, fold){
+      for(var i = 0; i < fold.faces_edges.length; ++i){
+        if(face != i){
+          var count = 0;
+          for(var j = 0; j < fold.faces_edges[i].length; ++j){
+            var y = fold.vertices_coords[vertex][1];
+            var cord1 = fold.vertices_coords[fold.edges_vertices[fold.faces_edges[i][j]][0]];
+            var cord2 = fold.vertices_coords[fold.edges_vertices[fold.faces_edges[i][j]][1]];
+            var m = (cord2[1] - cord1[1])/(cord2[0] - cord1[0]);
+            var x = (y + m * cord1[0] - cord1[1])/m;
+            var x1 = Math.min(cord1[0], cord2[0]);
+            var x2 = Math.max(cord1[0], cord2[0]);
+            if((x > x1 && x < x2 && x > fold.vertices_coords[vertex][0]) || !isFinite(x)){
+              ++count;
+            }
+          }
+          if(count % 2 == 1) return true;
+        }
+      }
+      return false;
+    }
+
+    function findAngle(x1, y1, x2, y2){
+      var angle = Math.atan((y1 - y2)/(x2 - x1));
+      angle *= 180/Math.PI;
+      if(x2 > x1 && y2 > y1){
+        angle = angle += 360;
+      }
+      if(x2 < x1 && y2 > y1){
+        angle += 180;
+      }
+      if(x2 < x1 && y2 <= y1){
+        angle += 180;
+      }
+      return angle;
+    }
+
+    function drawHighlight(index){
+      var svg = document.getElementsByTagName('svg')[0];
+      draw(fold, svg);
+      var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+      circle.setAttribute("cx", silhouette[index][0]);
+      circle.setAttribute("cy", silhouette[index][1]);
+      circle.setAttribute("r", 30);
+      circle.setAttribute("fill", "yellow");
+      circle.setAttribute("opacity", .5);
+      svg.appendChild(circle);
+    }
+
+    function contains(array, item){
+      for(var i = 0; i < array.length; ++i){
+        if(item[0] == array[i][0] && item[1] == array[i][1]){
+          return true;
+        }
+      }
+      return false;
+    }
+
+    
+    
+    function foldPointToPoint(fromX, fromY, toX, toY, fold, history){
+      var startLengthVertices = fold.vertices_coords.length;
+      var perpendicularBisector = perpendicularBisectorOfSegment(fromX, fromY, toX, toY);
+      var m = perpendicularBisector[0];
+      var b = perpendicularBisector[1];
+      var intersections = findIntersections(m, b, fold);
+      var edgesToNewVertex = new Object();
+      var edgesToNewEdges = new Object();
+      var faceEdgesToAdd = [];
+      var faceVerticesToAdd = [];
+      var facesToRemove = [];
+      var edgesToRemove = [];
+      for(var edge in intersections){
+        fold.vertices_coords.push(intersections[edge]);
+        edgesToNewVertex[edge] = fold.vertices_coords.length - 1;
+        fold.edges_vertices.push([fold.edges_vertices[edge][0], edgesToNewVertex[edge]]);
+        fold.edges_vertices.push([fold.edges_vertices[edge][1], edgesToNewVertex[edge]]);
+        edgesToNewEdges[edge] = [fold.edges_vertices.length - 2, fold.edges_vertices.length - 1];
+        edgesToRemove.push(edge);
+      }
+      for(var i = 0; i < fold.faces_vertices.length; ++i){
+        var intersectionWithFace = [];
+        for(var j = 0; j < fold.faces_edges[i].length; ++j){
+          if(fold.faces_edges[i][j] in intersections){
+            intersectionWithFace.push(edgesToNewVertex[fold.faces_edges[i][j]]);
+          }
+        }
+        if(intersectionWithFace.length == 0){
+          continue;
+        }
+        if(intersectionWithFace.length != 2){
+          console.log("wrong number of edges interested: " + intersectionWithFace.length + " found");
+          break;
+        }
+        var newFaceEdges = [[],[]];
+        var newFaceVertices = [[],[]];
+        var currentFace = 0;
+        for(var j = 0; j < fold.faces_edges[i].length; ++j){
+          if(fold.faces_edges[i][j] in intersections){
+            newFaceVertices[currentFace].push(fold.faces_vertices[i][j]);
+            var firstEdge = (fold.edges_vertices[edgesToNewEdges[fold.faces_edges[i][j]][0]][0] == fold.faces_vertices[i][j]) ? 0 : 1;
+            console.log(firstEdge + " " + edgesToNewEdges[fold.faces_edges[i][j]] + " " + fold.faces_vertices[i][j]);
+            newFaceEdges[currentFace].push(edgesToNewEdges[fold.faces_edges[i][j]][firstEdge]);
+            newFaceVertices[currentFace].push(edgesToNewVertex[fold.faces_edges[i][j]]);
+            if(currentFace == 0){
+              fold.edges_vertices.push([intersectionWithFace[0], intersectionWithFace[1]]);
+            }
+            newFaceEdges[currentFace].push(fold.edges_vertices.length - 1);
+            currentFace = 1 - currentFace;
+            newFaceVertices[currentFace].push(edgesToNewVertex[fold.faces_edges[i][j]]);
+            newFaceEdges[currentFace].push(edgesToNewEdges[fold.faces_edges[i][j]][1 - firstEdge]);
+          }
+          else{
+            newFaceVertices[currentFace].push(fold.faces_vertices[i][j]);
+            newFaceEdges[currentFace].push(fold.faces_edges[i][j]);
+          }
+        }
+        faceEdgesToAdd.push(newFaceEdges[0]);
+        faceEdgesToAdd.push(newFaceEdges[1]);
+        faceVerticesToAdd.push(newFaceVertices[0]);
+        faceVerticesToAdd.push(newFaceVertices[1]);
+        facesToRemove.push(i); 
+      }
+      facesToRemove.sort();
+      edgesToRemove.sort();
+      for(var i = facesToRemove.length - 1; i >= 0; --i){
+        fold.faces_edges.splice(facesToRemove[i], 1);
+        fold.faces_vertices.splice(facesToRemove[i], 1);
+      }
+      for(var i = 0; i < faceEdgesToAdd.length; ++i){
+        fold.faces_edges.push(faceEdgesToAdd[i]);
+        fold.faces_vertices.push(faceVerticesToAdd[i]);
+      }
+      for(var i = edgesToRemove.length - 1; i >= 0; --i){
+        removeEdge(edgesToRemove[i], fold);
+      }
+      for(var i = 0; i < startLengthVertices; ++i){
+        if(isAboveLine(m, b, fromX, fromY) == isAboveLine(m,b, fold.vertices_coords[i][0], fold.vertices_coords[i][1])){
+          var line = perpendicularOfLineThroughPoint(m, fold.vertices_coords[i][0], fold.vertices_coords[i][1]);
+          var x = (line[1] - b)/(m - line[0]);
+          var y = x * line[0] + line[1];
+          console.log(x - (fold.vertices_coords[i][0] - x) + " " + x + " " + y + " " + line + " " + fold.vertices_coords[i]);
+          fold.vertices_coords[i][0] = x - (fold.vertices_coords[i][0] - x);
+          fold.vertices_coords[i][1] = y - (fold.vertices_coords[i][1] - y);
+        }
+      }
+      console.log(fold.vertices_coords);
+      console.log(fold.edges_vertices);
+      console.log(fold.faces_vertices);
+      console.log(fold.faces_edges);
+    }
+
+    function foldVertexToPoint(vertex, toX, toY, fold, history){
+      foldPointToPoint(fold.vertices_coords[vertex][0], fold.vertices_coords[vertex][1], toX, toY, fold, history);
+    }
+
+    function perpendicularBisectorOfSegment(fromX, fromY, xCord, yCord){
+      var m1 = (fromY - yCord) / (fromX - xCord);
+      m1 = -1/m1;
+      var b1 = (yCord + fromY)/ 2 - m1 * (fromX + xCord) / 2;
+      return [m1, b1];
+    }
+
+    function findIntersections(m1, b1, fold){
+      var vertices = new Object();
+      for(var i = 0; i < fold.edges_vertices.length; ++i){
+        var cords = [fold.vertices_coords[fold.edges_vertices[i][0]], fold.vertices_coords[fold.edges_vertices[i][1]]];
+        var m2 = (cords[1][1] - cords[0][1]) / (cords[1][0] - cords[0][0]);
+        var b2 = cords[0][1] - m2 * cords[0][0];
+        var leftBound, rightBound;
+        var intersection = [];
+        if(cords[0][0] < cords[1][0]){
+          leftBound = cords[0][0];
+          rightBound = cords[1][0];
+          intersection = findIntersectionOfLineWithSegment(m1, b1, m2, b2, leftBound, rightBound);
+        }
+        else if(cords[0][0] > cords[1][0]){
+          leftBound = cords[1][0];
+          rightBound = cords[0][0];
+          if(intersection != []){
+            intersection = findIntersectionOfLineWithSegment(m1, b1, m2, b2, leftBound, rightBound);
+          }
+        }
+        else if (cords[0][0] == cords[1][0]){ 
+          var bottom, top;
+          leftBound = cords[0][0];
+          rightBound = cords[1][0];
+          if(cords[0][1] > cords[1][1]){
+            bottom = cords[1][1];
+            top = cords[0][1];
+          }
+          else{
+            bottom = cords[0][1];
+            top = cords[1][1];
+          }
+          var y = m1 * leftBound + b1;
+          if(y >= bottom && y <= top){
+            intersection = [leftBound, y];
+          }
+        }
+        if(intersection.length != 0){
+          vertices[i] = intersection;  
+        }
+      }
+      return vertices;
+    }
+
+    function removeEdge(index, fold){
+      for(var i = 0; i < fold.faces_edges.length; ++i){
+        for(var j = 0; j < fold.faces_edges[i].length; ++j){
+          if(fold.faces_edges[i][j] == index){
+            console.log("error: removing used edge");
+          }
+          if(fold.faces_edges[i][j] > index) {
+            --fold.faces_edges[i][j];
+          }
+        }
+      }
+      fold.edges_vertices.splice(index, 1);
+    }
+
+    function findAllConnectedEdges(vertex, fold){
+      var connectedEdges = [];
+      for(var i = 0; i < fold.edges_vertices.length; ++i){
+        if(fold.edges_vertices[i].includes(vertex)){
+          connectedEdges.push(i);
+        }
+      }
+      return connectedEdges;
+    }
+
+    function findAllConnectedVertices(vertex, fold){
+      var connectedVertices = [];
+      for(var i = 0; i < fold.edges_vertices.length; ++i){
+        if(fold.edges_vertices[i].includes(vertex)){
+          var index = fold.edges_vertices[i].indexOf(vertex);
+          connectedVertices.push(fold.edges_vertices[i][(index == 0) ? 1 : 0]);
+        }
+      }
+      return connectedVertices;
+    }
+    
+    function distance(x1, y1, x2, y2){
+      return Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+    }
+
+    function findRoughCenter(silhouette){
+      var xMinIndex = 0;
+      var xMaxIndex = 0;
+      var yMinIndex = 0;
+      var yMaxIndex = 0; 
+      for(var i = 0; i < silhouette.length; ++i){
+        if(silhouette[i][0] < silhouette[xMinIndex][0]){
+          xMinIndex = i;
+        }
+        if(silhouette[i][0] > silhouette[xMaxIndex][0]){
+          xMaxIndex = i;
+        }
+        if(silhouette[i][1] < silhouette[yMinIndex][1]){
+          yMinIndex = i;
+        }
+        if(silhouette[i][1] > silhouette[yMaxIndex][1]){
+          yMaxIndex = i;
+        }
+      }
+      var centerX = (silhouette[xMinIndex][0] + silhouette[xMaxIndex][0]) / 2;
+      var centerY = (silhouette[yMinIndex][1] + silhouette[yMaxIndex][1]) / 2;
+      return [centerX, centerY];
+    }
+
+    function findIntersectionOfLineWithSegment(m1, b1, m2, b2, leftBound, rightBound){
+      var x = (b2 - b1)/(m1 - m2);
+      if(x >= leftBound && x <= rightBound){
+        return [x, m1 * x + b1];
+      }
+      return [];
+    }
+
+    function perpendicularOfLineThroughPoint(m, x1, y1){
+      return[-1/m , y1 + 1/m*x1];
+    }
+
+    function isAboveLine(m, b, x, y){
+      var yLine = m * x + b;
+      if(yLine < y) return false;
+      else if(yLine > y) return true;
+      console.log("point is on line");
+      return false
+    }
+
+    function lineFromEdge(indexEdge, fold){
+      x1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][0];
+      y1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][1];
+      x2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
+      y2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
+      if(edgeAngle(indexEdge, fold) == 90){
+        return [Infinity, x1, indexEdge];
+      }
+      else if(edgeAngle(indexEdge, fold) == 0){
+        return [0, y1, edge];
+      }
+      var m = (y2 - y1) / (x2 - x1);
+      return [m, y2 - m * x2, edge];
+    }
+
+    function calculateVerticesFaces(fold){
+      var verticesFaces = [];
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
+        verticesFaces.push([]);
+        for(var j = 0; j < fold.faces_vertices.length; ++j){
+          for(var k = 0; k < fold.faces_vertices[i].length; ++k){
+            if(fold.faces_vertices[j][k] == i){
+              verticesFaces[i].push(j);
+            }
+          }
+        }
+      }
+    }
+
+    function calculateVerticesEdges(fold){
+      var verticesEdges = [];
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
+        verticesEdges.push([]);
+        for(var j = 0; j < fold.edges_vertices.length; ++j){
+          if(fold.edges_vertices[0] == i || fold.edges_vertices[1] == i){
+            verticesEdges[i].push(j);
+          }
+        }
+      }
+    }
+
+    function calculateEdgesFaces(fold){
+      var edgesFaces = [];
+      for(var i = 0; i < fold.edges_vertices.length; ++i){
+        edgesFaces.push([]);
+        for(var j = 0; j < fold.faces_edges.length; ++j){
+          for(var k = 0; k < fold.faces_edges[i].length; ++k){
+            if(fold.faces_edges[j][k] == i){
+              edgesFaces[i].push(j);
+            }
+          }
+        }
+      }
+    }
+  </script>
+  </svg>
+  </div>
+</body>
+</html>
+

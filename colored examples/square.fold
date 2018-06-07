@@ -1,0 +1,39 @@
+{
+"file_version": 1,
+"file_creator": "A text editor",
+"file_author": "Origami Assistant",
+"file_class": "foldedForm",
+"frame_attributes": ["2D"],
+"frame_title": "Square",
+"vertices_coords": [
+[0,600],
+[600,600],
+[600,0],
+[0,0]
+],
+"faces_vertices": [
+[0,1,2,3]
+],
+"faces_edges": [
+[0,1,2,3]
+],
+"edges_vertices": [
+[0,1],
+[1,2],
+[2,3],
+[3,0]
+],
+"edges_assignment": [
+"B",
+"B",
+"B",
+"B"
+],
+"faceOrders": [
+
+],
+"colors": [
+	true,
+	false
+]
+}
