@@ -163,7 +163,7 @@
       for(var i = 0; i < fold.faces_vertices.length; ++i){
         for(var j = 0; j < fold.faces_vertices[i].length; ++j){
           var vertex = fold.faces_vertices[i][j];
-          if(!visited.includes(vertex) && !contains(silhouette, fold.vertices_coords[vertex])){
+          if(!includes(visited, vertex) && !contains(silhouette, fold.vertices_coords[vertex])){
             if(!pointInFace(vertex, i, fold)){
               silhouette.push(fold.vertices_coords[vertex]);
             }
@@ -273,7 +273,7 @@
           continue;
         }
         if(intersectionWithFace.length != 2){
-          console.log("wrong number of edges interested: " + intersectionWithFace.length + " found");
+          console.log("wrong number of edges intersected: " + intersectionWithFace.length + " found");
           break;
         }
         var newFaceEdges = [[],[]];
@@ -406,7 +406,7 @@
     function findAllConnectedEdges(vertex, fold){
       var connectedEdges = [];
       for(var i = 0; i < fold.edges_vertices.length; ++i){
-        if(fold.edges_vertices[i].includes(vertex)){
+        if(includes(fold.edges_vertices[i], vertex)){
           connectedEdges.push(i);
         }
       }
@@ -416,7 +416,7 @@
     function findAllConnectedVertices(vertex, fold){
       var connectedVertices = [];
       for(var i = 0; i < fold.edges_vertices.length; ++i){
-        if(fold.edges_vertices[i].includes(vertex)){
+        if(includes(fold.edges_vertices[i], vertex)){
           var index = fold.edges_vertices[i].indexOf(vertex);
           connectedVertices.push(fold.edges_vertices[i][(index == 0) ? 1 : 0]);
         }
@@ -525,6 +525,13 @@
           }
         }
       }
+    }
+
+    function includes(array, element){
+      for(var i = 0; i < array.length; ++i){
+        if(array[i] == element) return true;
+      }
+      return false;
     }
   </script>
   </svg>
