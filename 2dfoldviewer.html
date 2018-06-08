@@ -148,8 +148,12 @@
       y1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][1];
       x2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
       y2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
+      if(x2 == x1){
+        return 90;
+      }
       var angle = Math.atan((y1 - y2)/(x2 - x1));
       angle *= 180/Math.PI;
+      return angle;
     }
 
     function isParrallelEdges(indexEdge1, indexEdge2, fold){
