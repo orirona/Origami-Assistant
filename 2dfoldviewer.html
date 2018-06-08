@@ -342,7 +342,9 @@
 
     function perpendicularBisectorOfSegment(fromX, fromY, xCord, yCord){
       var m1 = (fromY - yCord) / (fromX - xCord);
+      //where m1 is the slope of the line that we are finding a perpendicular bisector to
       if(m1 == 0){
+        //a line perpendicular to a line with slope 0 has a slope of Infinity
         m1 = Infinity;
       }
       else{
