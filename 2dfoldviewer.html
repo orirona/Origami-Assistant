@@ -341,17 +341,19 @@
     }
 
     function perpendicularBisectorOfSegment(fromX, fromY, xCord, yCord){
-      var m1 = (fromY - yCord) / (fromX - xCord);
-      //where m1 is the slope of the line that we are finding a perpendicular bisector to
+      var m1 = (fromY - yCord) / (fromX - xCord); //slope of segment bisected
+      var m2; // slope of bisector
+      var b1;
       if(m1 == 0){
         //a line perpendicular to a line with slope 0 has a slope of Infinity
-        m1 = Infinity;
+        m2 = Infinity;
+        b1 = (fromX + xCord)/ 2;
       }
       else{
-        m1 = -1/m1;
+        m2 = -1/m1;
+        b1 = (yCord + fromY)/ 2 - m2 * (fromX + xCord) / 2;
       }
-      var b1 = (yCord + fromY)/ 2 - m1 * (fromX + xCord) / 2;
-      return [m1, b1];
+      return [m2, b1];
     }
 
     function findIntersections(m1, b1, fold){
