@@ -24,6 +24,7 @@
       silhouette = [];
       var reader = new FileReader();
       reader.onload = function(e) {
+        document.removeEventListener('mousemove', onmousemove);
         var text = reader.result;
         fold = JSON.parse(text);
         foldBackup = JSON.parse(JSON.stringify(fold)); 
@@ -31,7 +32,7 @@
         var history = [];
         silhouette = makeSilhouette(fold);
         draw(fold, document.getElementsByTagName('svg')[0]);
-        drawHighlight(0);
+        //drawHighlight(0);
       }
       reader.readAsText(file);
     }
@@ -44,25 +45,22 @@
     };
 
     document.onmousedown = function(evt){
+      var boundingRect = document.getElementsByTagName('rect')[0].getBoundingClientRect();
+      var nearestVertex = findNearestVertex(evt.clientX - boundingRect.left, evt.clientY - boundingRect.top, fold);
       function onmousemove(evt) {
         fold = JSON.parse(JSON.stringify(foldBackup));
         silhouette = makeSilhouette(fold);
-        foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
+        foldPointToPoint(nearestVertex[0],nearestVertex[1],evt.clientX, evt.clientY, fold, []);
         draw(fold, document.getElementsByTagName('svg')[0]);   
       }
-      document.addEventListener('mousemove', onmousemove);
+      if(nearestVertex != null){
+        document.addEventListener('mousemove', onmousemove);  
+      }
       document.onmouseup = function() {
-        foldBackup = JSON.parse(JSON.stringify(fold));
         document.removeEventListener('mousemove', onmousemove);
+        foldBackup = JSON.parse(JSON.stringify(fold));
       };
     };
-
-    // document.onmouseup = function(evt){
-    //   foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
-    //   foldBackup = JSON.parse(JSON.stringify(fold)); 
-    //   silhouette = makeSilhouette(fold);
-    //   draw(fold, document.getElementsByTagName('svg')[0]);
-    // };
 
     function draw(fold, svg) {  
       while(svg.lastChild) {
@@ -156,7 +154,7 @@
       return angle;
     }
 
-    function isParrallelEdges(indexEdge1, indexEdge2, fold){
+    function isParallelEdges(indexEdge1, indexEdge2, fold){
       var EPS = .05;
       return Math.abs(edgeAngle(indexEdge1, fold) - edgeAngle(indexEdge2, fold)) < EPS;
     }
@@ -435,7 +433,7 @@
       return connectedVertices;
     }
     
-    function distance(x1, y1, x2, y2){
+    function findDistance(x1, y1, x2, y2){
       return Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
     }
 
@@ -487,7 +485,7 @@
       x1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][0];
       y1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][1];
       x2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
-      y2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
+      y2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][1];
       if(edgeAngle(indexEdge, fold) == 90){
         return [Infinity, x1, indexEdge];
       }
@@ -543,6 +541,26 @@
         if(array[i] == element) return true;
       }
       return false;
+    }
+
+    function findNearestVertex(x, y, fold){
+      var maxDistance = 25; // the max distance to select a vertex
+      var minDistance = 10000;
+      var minDistanceIndex = 0;
+      //finds closest vertex
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
+        var distance = findDistance(x,y, fold.vertices_coords[i][0], fold.vertices_coords[i][1]);
+
+        if(distance < minDistance){
+          minDistance = distance;
+          minDistanceIndex = i;
+        }
+      }
+      //is that closest vertex close enough?
+      if(minDistance <= maxDistance){
+        return [fold.vertices_coords[minDistanceIndex][0], fold.vertices_coords[minDistanceIndex][1]];
+      }
+      return null;
     }
   </script>
   </svg>
