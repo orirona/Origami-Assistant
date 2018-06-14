@@ -26,7 +26,7 @@
       reader.onload = function(e) {
         var text = reader.result;
         fold = JSON.parse(text);
-        foldBackup = JSON.parse(JSON.stringify(fold)); 
+        foldBackup = JSON.parse(JSON.stringify(fold));
         initFoldFile(fold);
         var history = [];
         silhouette = makeSilhouette(fold);
@@ -48,7 +48,7 @@
         fold = JSON.parse(JSON.stringify(foldBackup));
         silhouette = makeSilhouette(fold);
         foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
-        draw(fold, document.getElementsByTagName('svg')[0]);   
+        draw(fold, document.getElementsByTagName('svg')[0]);
       }
       document.addEventListener('mousemove', onmousemove);
       document.onmouseup = function() {
@@ -59,12 +59,12 @@
 
     // document.onmouseup = function(evt){
     //   foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
-    //   foldBackup = JSON.parse(JSON.stringify(fold)); 
+    //   foldBackup = JSON.parse(JSON.stringify(fold));
     //   silhouette = makeSilhouette(fold);
     //   draw(fold, document.getElementsByTagName('svg')[0]);
     // };
 
-    function draw(fold, svg) {  
+    function draw(fold, svg) {
       while(svg.lastChild) {
         svg.removeChild(svg.lastChild);
       }
@@ -81,7 +81,7 @@
           else{
             d += "L" + location + " ";
           }
-        }  
+        }
         appendPath(d, i, svg, fold.colors[i]);
       }
       appendFrame(svg);
@@ -91,8 +91,8 @@
       if(fold.colors === []){
         for(var i = 0; i < fold.faces_vertices.length; ++i){
           fold.colors.push(false);
-        } 
-      } 
+        }
+      }
     }
 
     function appendPath(d, i, svg, color){
@@ -138,28 +138,104 @@
       }
       fold.faces_vertices.reverse();
     }
-    
+
     function foldEdgeToEdge(indexEdgeOne, indexEdgeTwo, fold, history){
-      
+      x1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][0];
+      y1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][1];
+      x2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][0];
+      y2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][1];
+      x3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][0];
+      y3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][1];
+      x4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][0];
+      y4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][1];
+      line1 = lineFromEdge(indexEdgeOne);
+      line2 = lineFromEdge(indexEdgeTwo);
+      pt = intersectionOfTwoLines(line1[0], line1[1], line2[0], line2[1]);
+      m1 = line1[0];
+      b1 = line1[1];
+      m2 = line2[0];
+      b2 = line2[1];
+      if (m1 == m2 && b1 == b2){
+              // coincident lines no folding
+            }
+        else{
+          if (pt[0] == []){
+            // empty intersection:  two different parallel lines
+            b3 = y1 - 1/m1*x1;
+            x5 = (b3 - b2)/(m1 - 1/m1)
+            y5 = m1*x5 + b2;
+            foldPointToPoint(x1, y1, x5, y5, fold, history);
+           }
+           else{
+             //distance from intersection to edgeOne endpoints
+             var dist1 = distance(pt[0], pt[1], x1, y1);
+             var dist2 = distance(pt[0], pt[1], x2, y2);
+             if (dist1 < dist2){
+               // intersection closer to endpoint 0 of edgeOne
+               // c has subtracted d squared
+               var a = 1 + m2*m2;
+               var b = 2*(m2*b2-pt[0]-m2*pt[1]);
+               var c = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
+                       - 2*b2*pt[1]-b2*b2-2*b2*pt[1]
+                       - dist2*dist2;
+               x = -b + Math.sqrt(b*b - 4*a*c)/(2*a);
+               y = m1*x + b1;
+               foldPointToPoint(x2, y2, x, y, fold, history);
+             }
+             else{
+               var a = 1 + m2*m2;
+               var b = 2*(m2*b2-pt[0]-m2*pt[1]);
+               var c = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
+                       - 2*b2*pt[1]-b2*b2-2*b2*pt[1]
+                       -dist1*dist1;
+               x = (-b + Math.sqrt(b*b - 4*a*c))/(2*a);
+               y = m2*x + b2;
+               foldPointToPoint(x1, y1, x, y, fold, history);
+             }
+
+
+           }
+        }
+
+
+
     }
 
     function edgeAngle(indexEdge, fold){
       x1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][0];
       y1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][1];
       x2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
-      y2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
+      y2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][1];
       if(x2 == x1){
         return 90;
       }
       var angle = Math.atan((y1 - y2)/(x2 - x1));
-      angle *= 180/Math.PI;
-      return angle;
+      angle *= 180/Math.Pi
     }
 
-    function isParrallelEdges(indexEdge1, indexEdge2, fold){
+    function isParallelEdges(indexEdge1, indexEdge2, fold){
       var EPS = .05;
       return Math.abs(edgeAngle(indexEdge1, fold) - edgeAngle(indexEdge2, fold)) < EPS;
     }
+    function intersectionOfTwoLines(m1, b1, m2, b2){
+// are slopes equal if so are lines parallel
+      if (m1 == m2){
+        if (b1 == b2){
+          console.log('two lines same' + ' ' + m1 + ' ' b1)
+          return ['same line', 'same line'];
+        }
+        else {
+          console.log('parallel no intersection')
+          return [[], []];
+        }
+      }
+      else {
+      console.log('intersection')
+      return [(b2 - b1)/(m1 - m2), (m2*b1 - m1*b2)/(m2 - m1)]
+    }
+  function lineFromPointandSlope(x1, y1, m){
+    return [m, y1-m*x1, [[0, y1-m*x1], [x1, y1]]]
+  }
 
     function makeSilhouette(fold){
       var visited = [];
@@ -180,7 +256,7 @@
       silhouette.sort(function(a, b){
         if(findAngle(centerX, centerY, a[0], a[1]) > findAngle(centerX, centerY, b[0], b[1])){
           return 1;
-        }  
+        }
         return -1;
       });
       return silhouette;
@@ -244,8 +320,8 @@
       return false;
     }
 
-    
-    
+
+
     function foldPointToPoint(fromX, fromY, toX, toY, fold, history){
       var startLengthVertices = fold.vertices_coords.length;
       var perpendicularBisector = perpendicularBisectorOfSegment(fromX, fromY, toX, toY);
@@ -306,7 +382,7 @@
         faceEdgesToAdd.push(newFaceEdges[1]);
         faceVerticesToAdd.push(newFaceVertices[0]);
         faceVerticesToAdd.push(newFaceVertices[1]);
-        facesToRemove.push(i); 
+        facesToRemove.push(i);
       }
       facesToRemove.sort();
       edgesToRemove.sort();
@@ -376,7 +452,7 @@
             intersection = findIntersectionOfLineWithSegment(m1, b1, m2, b2, leftBound, rightBound);
           }
         }
-        else if (cords[0][0] == cords[1][0]){ 
+        else if (cords[0][0] == cords[1][0]){
           var bottom, top;
           leftBound = cords[0][0];
           rightBound = cords[1][0];
@@ -394,7 +470,7 @@
           }
         }
         if(intersection.length != 0){
-          vertices[i] = intersection;  
+          vertices[i] = intersection;
         }
       }
       return vertices;
@@ -434,7 +510,7 @@
       }
       return connectedVertices;
     }
-    
+
     function distance(x1, y1, x2, y2){
       return Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
     }
@@ -443,7 +519,7 @@
       var xMinIndex = 0;
       var xMaxIndex = 0;
       var yMinIndex = 0;
-      var yMaxIndex = 0; 
+      var yMaxIndex = 0;
       for(var i = 0; i < silhouette.length; ++i){
         if(silhouette[i][0] < silhouette[xMinIndex][0]){
           xMinIndex = i;
@@ -487,7 +563,7 @@
       x1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][0];
       y1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][1];
       x2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
-      y2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][0];
+      y2 = fold.vertices_coords[fold.edges_vertices[indexEdge][1]][1];
       if(edgeAngle(indexEdge, fold) == 90){
         return [Infinity, x1, indexEdge];
       }
@@ -549,4 +625,3 @@
   </div>
 </body>
 </html>
-
