@@ -151,8 +151,11 @@
       line1 = lineFromEdge(indexEdgeOne);
       line2 = lineFromEdge(indexEdgeTwo);
       pt = intersectionOfTwoLines(line1[0], line1[1], line2[0], line2[1]);
-      if (((pt[0] == line1[0]) && (pt[1] == line1[1])) ||
-            ((pt[0] == line2[0]) && (pt[1] == line2[1]))){
+      m1 = line1[0];
+      b1 = line1[1];
+      m2 = line2[0];
+      b2 = line2[1];
+      if (m1 == m2 && b1 == b2blockquote){
               // coincident lines no folding
             }
         else{
