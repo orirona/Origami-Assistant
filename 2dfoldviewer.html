@@ -161,9 +161,9 @@
         else{
           if (pt[0] == []){
             // empty intersection:  two different parallel lines
-            b3 = y1 - 1/line1[0]*x1;
-            x5 = (b3 - line2[1])/(line1[0] - 1/line1[0])
-            y5 = line1[0]*x5 + line2[1];
+            b3 = y1 - 1/m1*x1;
+            x5 = (b3 - b2)/(m1 - 1/m1)
+            y5 = m1*x5 + b2;
             foldPointToPoint(x1, y1, x5, y5, fold, history);
            }
            else{
@@ -173,23 +173,23 @@
              if (dist1 < dist2){
                // intersection closer to endpoint 0 of edgeOne
                // c has subtracted d squared
-               var a = 1 + line2[0]*line2[0];
-               var b = 2*(line2[0]*line2[1]-pt[0]-line2[0]*pt[1]);
-               var c = pt[0]*pt[0]+pt[1]*pt[1]+line2[1]*line2[1]
-                       - 2*line2[1]*pt[1]-line2[1]*line2[1]-2*line2[1]*pt[1]
+               var a = 1 + m2*m2;
+               var b = 2*(m2*b2-pt[0]-m2*pt[1]);
+               var c = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
+                       - 2*b2*pt[1]-b2*b2-2*b2*pt[1]
                        - dist2*dist2;
                x = -b + Math.sqrt(b*b - 4*a*c)/(2*a);
-               y = line1[0]*x + line1[1];
+               y = m1*x + b1;
                foldPointToPoint(x2, y2, x, y, fold, history);
              }
              else{
-               var a = 1 + line2[0]*line2[0];
-               var b = 2*(line2[0]*line2[1]-pt[0]-line2[0]*pt[1]);
-               var c = pt[0]*pt[0]+pt[1]*pt[1]+line2[1]*line2[1]
-                       - 2*line2[1]*pt[1]-line2[1]*line2[1]-2*line2[1]*pt[1]
-                       dist1*dist1;
-               x = -b + Math.sqrt(b*b - 4*a*c)/(2*a);
-               y = line2[0]*x + line2[1];
+               var a = 1 + m2*m2;
+               var b = 2*(m2*b2-pt[0]-m2*pt[1]);
+               var c = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
+                       - 2*b2*pt[1]-b2*b2-2*b2*pt[1]
+                       -dist1*dist1;
+               x = (-b + Math.sqrt(b*b - 4*a*c))/(2*a);
+               y = m2*x + b2;
                foldPointToPoint(x1, y1, x, y, fold, history);
              }
 
@@ -210,7 +210,7 @@
         return 90;
       }
       var angle = Math.atan((y1 - y2)/(x2 - x1));
-      angle *= 18
+      angle *= 180/Math.Pi
     }
 
     function isParallelEdges(indexEdge1, indexEdge2, fold){
@@ -218,7 +218,7 @@
       return Math.abs(edgeAngle(indexEdge1, fold) - edgeAngle(indexEdge2, fold)) < EPS;
     }
     function intersectionOfTwoLines(m1, b1, m2, b2){
-// are slopes equal if so are lines coincident
+// are slopes equal if so are lines parallel
       if (m1 == m2){
         if (b1 == b2){
           console.log('two lines same' + ' ' + m1 + ' ' b1)
@@ -231,7 +231,7 @@
       }
       else {
       console.log('intersection')
-      return [(b2 - b1)/(m1 - m2), (m2*b1 + m1*b2)/(m1+m2)]
+      return [(b2 - b1)/(m1 - m2), (m2*b1 - m1*b2)/(m2 - m1)]
     }
   function lineFromPointandSlope(x1, y1, m){
     return [m, y1-m*x1, [[0, y1-m*x1], [x1, y1]]]
