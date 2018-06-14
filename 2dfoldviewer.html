@@ -155,12 +155,12 @@
       b1 = line1[1];
       m2 = line2[0];
       b2 = line2[1];
-      if (m1 == m2 && b1 == b2blockquote){
+      if (m1 == m2 && b1 == b2){
               // coincident lines no folding
             }
         else{
           if (pt[0] == []){
-            // two different parallel lines
+            // empty intersection:  two different parallel lines
             b3 = y1 - 1/line1[0]*x1;
             x5 = (b3 - line2[1])/(line1[0] - 1/line1[0])
             y5 = line1[0]*x5 + line2[1];
@@ -177,7 +177,7 @@
                var b = 2*(line2[0]*line2[1]-pt[0]-line2[0]*pt[1]);
                var c = pt[0]*pt[0]+pt[1]*pt[1]+line2[1]*line2[1]
                        - 2*line2[1]*pt[1]-line2[1]*line2[1]-2*line2[1]*pt[1]
-                       dist2*dist2;
+                       - dist2*dist2;
                x = -b + Math.sqrt(b*b - 4*a*c)/(2*a);
                y = line1[0]*x + line1[1];
                foldPointToPoint(x2, y2, x, y, fold, history);
