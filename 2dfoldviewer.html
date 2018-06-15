@@ -26,7 +26,7 @@
       reader.onload = function(e) {
         var text = reader.result;
         fold = JSON.parse(text);
-        foldBackup = JSON.parse(JSON.stringify(fold)); 
+        foldBackup = JSON.parse(JSON.stringify(fold));
         initFoldFile(fold);
         var history = [];
         silhouette = makeSilhouette(fold);
@@ -48,7 +48,7 @@
         fold = JSON.parse(JSON.stringify(foldBackup));
         silhouette = makeSilhouette(fold);
         foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
-        draw(fold, document.getElementsByTagName('svg')[0]);   
+        draw(fold, document.getElementsByTagName('svg')[0]);
       }
       document.addEventListener('mousemove', onmousemove);
       document.onmouseup = function() {
@@ -59,12 +59,12 @@
 
     // document.onmouseup = function(evt){
     //   foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
-    //   foldBackup = JSON.parse(JSON.stringify(fold)); 
+    //   foldBackup = JSON.parse(JSON.stringify(fold));
     //   silhouette = makeSilhouette(fold);
     //   draw(fold, document.getElementsByTagName('svg')[0]);
     // };
 
-    function draw(fold, svg) {  
+    function draw(fold, svg) {
       while(svg.lastChild) {
         svg.removeChild(svg.lastChild);
       }
@@ -81,7 +81,7 @@
           else{
             d += "L" + location + " ";
           }
-        }  
+        }
         appendPath(d, i, svg, fold.colors[i]);
       }
       appendFrame(svg);
@@ -91,8 +91,8 @@
       if(fold.colors === []){
         for(var i = 0; i < fold.faces_vertices.length; ++i){
           fold.colors.push(false);
-        } 
-      } 
+        }
+      }
     }
 
     function appendPath(d, i, svg, color){
@@ -138,9 +138,9 @@
       }
       fold.faces_vertices.reverse();
     }
-    
+
     function foldEdgeToEdge(indexEdgeOne, indexEdgeTwo, fold, history){
-      
+
     }
 
     function edgeAngle(indexEdge, fold){
@@ -156,7 +156,7 @@
       return angle;
     }
 
-    function isParrallelEdges(indexEdge1, indexEdge2, fold){
+    function isParallelEdges(indexEdge1, indexEdge2, fold){
       var EPS = .05;
       return Math.abs(edgeAngle(indexEdge1, fold) - edgeAngle(indexEdge2, fold)) < EPS;
     }
@@ -180,7 +180,7 @@
       silhouette.sort(function(a, b){
         if(findAngle(centerX, centerY, a[0], a[1]) > findAngle(centerX, centerY, b[0], b[1])){
           return 1;
-        }  
+        }
         return -1;
       });
       return silhouette;
@@ -244,8 +244,8 @@
       return false;
     }
 
-    
-    
+
+
     function foldPointToPoint(fromX, fromY, toX, toY, fold, history){
       var startLengthVertices = fold.vertices_coords.length;
       var perpendicularBisector = perpendicularBisectorOfSegment(fromX, fromY, toX, toY);
@@ -306,7 +306,7 @@
         faceEdgesToAdd.push(newFaceEdges[1]);
         faceVerticesToAdd.push(newFaceVertices[0]);
         faceVerticesToAdd.push(newFaceVertices[1]);
-        facesToRemove.push(i); 
+        facesToRemove.push(i);
       }
       facesToRemove.sort();
       edgesToRemove.sort();
@@ -376,7 +376,7 @@
             intersection = findIntersectionOfLineWithSegment(m1, b1, m2, b2, leftBound, rightBound);
           }
         }
-        else if (cords[0][0] == cords[1][0]){ 
+        else if (cords[0][0] == cords[1][0]){
           var bottom, top;
           leftBound = cords[0][0];
           rightBound = cords[1][0];
@@ -394,7 +394,7 @@
           }
         }
         if(intersection.length != 0){
-          vertices[i] = intersection;  
+          vertices[i] = intersection;
         }
       }
       return vertices;
@@ -434,7 +434,7 @@
       }
       return connectedVertices;
     }
-    
+
     function distance(x1, y1, x2, y2){
       return Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
     }
@@ -443,7 +443,7 @@
       var xMinIndex = 0;
       var xMaxIndex = 0;
       var yMinIndex = 0;
-      var yMaxIndex = 0; 
+      var yMaxIndex = 0;
       for(var i = 0; i < silhouette.length; ++i){
         if(silhouette[i][0] < silhouette[xMinIndex][0]){
           xMinIndex = i;
@@ -549,4 +549,3 @@
   </div>
 </body>
 </html>
-
