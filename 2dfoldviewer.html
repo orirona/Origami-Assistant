@@ -30,7 +30,6 @@
         initFoldFile(fold);
         var history = [];
         silhouette = makeSilhouette(fold);
-        foldEdgeToEdge(1,3,fold,history);
         draw(fold, document.getElementsByTagName('svg')[0]);
         drawHighlight(0);
       }
@@ -53,6 +52,8 @@
       }
       document.addEventListener('mousemove', onmousemove);
       document.onmouseup = function() {
+        //foldEdgeToEdge(2,1,fold,[]);
+        //foldPointToPoint(0,0,600,600,fold,[]);
         foldBackup = JSON.parse(JSON.stringify(fold));
         document.removeEventListener('mousemove', onmousemove);
       };
@@ -85,6 +86,7 @@
         }
         appendPath(d, i, svg, fold.colors[i]);
       }
+      //highlightEdge (0, svg, fold);
       appendFrame(svg);
     }
 
@@ -141,30 +143,43 @@
     }
 
     function foldEdgeToEdge(indexEdgeOne, indexEdgeTwo, fold, history){
-      x1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][0];
-      y1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][1];
-      x2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][0];
-      y2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][1];
-      x3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][0];
-      y3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][1];
-      x4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][0];
-      y4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][1];
-      line1 = lineFromEdge(indexEdgeOne, fold);
-      line2 = lineFromEdge(indexEdgeTwo, fold);
-      pt = intersectionOfTwoLines(line1[0], line1[1], line2[0], line2[1]);
-      m1 = line1[0];
-      b1 = line1[1];
-      m2 = line2[0];
-      b2 = line2[1];
+      var x1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][0];
+      var y1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][1];
+      var x2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][0];
+      var y2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][1];
+      var x3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][0];
+      var y3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][1];
+      var x4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][0];
+      var y4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][1];
+      var x5 = x2;
+      var y5 = y2;
+      var line1 = lineFromEdge(indexEdgeOne, fold);
+      var line2 = lineFromEdge(indexEdgeTwo, fold);
+      var pt = intersectionOfTwoLines(line1[0], line1[1], line2[0], line2[1]);
+      var m1 = line1[0];
+      var b1 = line1[1];
+      var m2 = line2[0];
+      var b2 = line2[1];
       if (m1 == m2 && b1 == b2){
               // coincident lines no folding
             }
         else{
-          if (pt[0] == []){
+          if (m1 == m2){
             // empty intersection:  two different parallel lines
-            b3 = y1 - 1/m1*x1;
-            x5 = (b3 - b2)/(m1 - 1/m1);
-            y5 = m1*x5 + b2;
+            if(m1 == 0){
+              x5 = x1;
+              y5 = b2;
+            }
+            else if(!isFinite(m1)){
+              x5 = b2;
+              y5 = y1;
+            }
+            else{
+              b3 = y1 - 1/m1*x1;
+              x5 = (b3 - b2)/(m1 - 1/m1);
+              y5 = m1*x5 + b2;
+            }
+            //console.log("x1: , " + x1 + "y1: , " + y1 + "x5: " + x5 + "y5: " + y5);
             foldPointToPoint(x1, y1, x5, y5, fold, history);
            }
            else{
@@ -177,7 +192,7 @@
                var a = 1 + m2*m2;
                var b = 2*(m2*b2-pt[0]-m2*pt[1]);
                var c = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
-                       - 2*b2*pt[1]-b2*b2-2*b2*pt[1]
+                       - 2*b2*pt[1]-b2*b2
                        - dist2*dist2;
                x = -b + Math.sqrt(b*b - 4*a*c)/(2*a);
                y = m1*x + b1;
@@ -187,10 +202,11 @@
                var a = 1 + m2*m2;
                var b = 2*(m2*b2-pt[0]-m2*pt[1]);
                var c = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
-                       - 2*b2*pt[1]-b2*b2-2*b2*pt[1]
+                       - 2*b2*pt[1]-b2*b2
                        -dist1*dist1;
                x = (-b + Math.sqrt(b*b - 4*a*c))/(2*a);
                y = m2*x + b2;
+               //console.log(x1 + " " + y1 + " " + x + " " + y);
                foldPointToPoint(x1, y1, x, y, fold, history);
              }
 
@@ -406,10 +422,10 @@
           fold.vertices_coords[i][1] = y - (fold.vertices_coords[i][1] - y);
         }
       }
-      // console.log(fold.vertices_coords);
-      // console.log(fold.edges_vertices);
-      // console.log(fold.faces_vertices);
-      // console.log(fold.faces_edges);
+      console.log(fold.vertices_coords);
+      console.log(fold.edges_vertices);
+      console.log(fold.faces_vertices);
+      console.log(fold.faces_edges);
     }
 
     function foldVertexToPoint(vertex, toX, toY, fold, history){
@@ -441,15 +457,25 @@
         var leftBound, rightBound;
         var intersection = [];
         if(cords[0][0] < cords[1][0]){
-          leftBound = cords[0][0];
-          rightBound = cords[1][0];
-          intersection = findIntersectionOfLineWithSegment(m1, b1, m2, b2, leftBound, rightBound);
+          if(!isFinite(m1)){
+            intersection = [b1, b1 * m2 + b2];
+          }
+          else{
+            leftBound = cords[0][0];
+            rightBound = cords[1][0];
+            intersection = findIntersectionOfLineWithSegment(m1, b1, m2, b2, leftBound, rightBound);
+          }
         }
         else if(cords[0][0] > cords[1][0]){
-          leftBound = cords[1][0];
-          rightBound = cords[0][0];
-          if(intersection != []){
-            intersection = findIntersectionOfLineWithSegment(m1, b1, m2, b2, leftBound, rightBound);
+          if(!isFinite(m1)){
+            intersection = [b1, b1 * m2 + b2];
+          }
+          else{
+            leftBound = cords[1][0];
+            rightBound = cords[0][0];
+            if(intersection != []){
+              intersection = findIntersectionOfLineWithSegment(m1, b1, m2, b2, leftBound, rightBound);
+            }
           }
         }
         else if (cords[0][0] == cords[1][0]){
@@ -567,10 +593,10 @@
         return [Infinity, x1, indexEdge];
       }
       else if(edgeAngle(indexEdge, fold) == 0){
-        return [0, y1, edge];
+        return [0, y1, indexEdge];
       }
       var m = (y2 - y1) / (x2 - x1);
-      return [m, y2 - m * x2, edge];
+      return [m, y2 - m * x2, indexEdge];
     }
 
     function calculateVerticesFaces(fold){
@@ -618,6 +644,27 @@
         if(array[i] == element) return true;
       }
       return false;
+    }
+
+    function highlightEdge(edgeIndex, svg, fold){
+      var line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+      var x1 = fold.vertices_coords[fold.edges_vertices[edgeIndex][0]][0];
+      var y1 = fold.vertices_coords[fold.edges_vertices[edgeIndex][0]][1];
+      var x2 = fold.vertices_coords[fold.edges_vertices[edgeIndex][1]][0];
+      var y2 = fold.vertices_coords[fold.edges_vertices[edgeIndex][1]][1];
+      line.setAttribute("x1",x1);
+      line.setAttribute("y1",y1);
+      line.setAttribute("x2",x2);
+      line.setAttribute("y2",y2);
+      line.setAttribute("stroke-alignment", "outside");
+      line.setAttribute("stroke-width", "40");
+      line.setAttribute("stroke", "red");
+      console.log(line);
+      svg.appendChild(line);
+    }
+
+    function highlightVertices(vertices, svg, fold){
+
     }
   </script>
   </svg>
