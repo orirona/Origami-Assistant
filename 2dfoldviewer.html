@@ -663,8 +663,27 @@
     }
 
     function highlightVertices(vertices, svg, fold){
-
+      //TODO: Implement
     }
+
+    function findNearestVertex(x, y, fold){
+      var maxDistance = 25; // the max distance to select a vertex
+      var minDistance = 10000;
+      var minDistanceIndex = 0;
+      //finds closest vertex
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
+        var distance = findDistance(x,y, fold.vertices_coords[i][0], fold.vertices_coords[i][1]);
+
+        if(distance < minDistance){
+          minDistance = distance;
+          minDistanceIndex = i;
+        }
+      }
+      //is that closest vertex close enough?
+      if(minDistance <= maxDistance){
+        return [fold.vertices_coords[minDistanceIndex][0], fold.vertices_coords[minDistanceIndex][1]];
+      }
+      return null;
   </script>
   </svg>
   </div>
