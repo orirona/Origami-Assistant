@@ -1,0 +1,58 @@
+{
+"file_version": 1,
+"file_creator": "A text editor",
+"file_author": "Rob",
+"file_class": "foldedForm",
+"frame_attributes": ["2D"],
+"frame_title": "Rob's Houseroof",
+"vertices_coords": [
+[0,600,0],
+[600,600,0],
+[600,300,0],
+[300,0,0],
+[0,300,0],
+[300,300,0],
+[300,300,0]
+],
+"faces_vertices": [
+[0,1,2,3,4],
+[4,5,3],
+[6,2,3]
+],
+"faces_edges": [
+[0,1,2,3,4],
+[5,6,3],
+[7,2,8]
+],
+"edges_vertices": [
+[0,1],
+[1,2],
+[2,3],
+[3,4],
+[4,0],
+[4,5],
+[5,3],
+[2,6],
+[6,3]
+],
+"edges_assignment": [
+"B",
+"B",
+"V",
+"V",
+"B",
+"B",
+"B",
+"B",
+"B"
+],
+"faceOrders": [
+ 	[1,0,1],
+ 	[2,0,1]
+],
+"colors": [
+	true,
+	false,
+	false
+]
+}
