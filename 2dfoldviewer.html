@@ -15,6 +15,7 @@
   <rect x="0" y="0" width="600" height="600" fill="none" stroke="black" stroke-width = "16"/>
   <script>
     var vertexIndex = 0;
+    console.log('test');
     var silhouette = [];
     var fold, foldBackup;
     document.getElementById('fileInput').addEventListener('change', selectFile, false);
@@ -65,6 +66,7 @@
     // };
 
     function draw(fold, svg) {
+      console.log('test');
       while(svg.lastChild) {
         svg.removeChild(svg.lastChild);
       }
@@ -158,7 +160,7 @@
       b2 = line2[1];
       EPS = 5;
       EPS1 = .95
-      if pt[0] == 'same line'){
+      if(pt[0] == 'same line'){
         //same line no folding
       }
       else {
@@ -180,7 +182,7 @@
              var dist1 = distance(pt[0], pt[1], x1, y1);
              var dist2 = distance(pt[0], pt[1], x2, y2);
                if ((dist1 < EPS && dist2 < EPS ) ||
-                 (dist3 < EPS && dist4 < EPS ){
+                 (dist3 < EPS && dist4 < EPS )){
                //dont fold edge of length 0
                 }
                 else {
@@ -271,7 +273,7 @@
     }
     function intersectionOfTwoLines(m1, b1, m2, b2){
       // are slopes equal if so are lines parallel
-      if (((!isFinite(m1)&&!isFinite(m2)) ||
+      if ((!isFinite(m1)&&!isFinite(m2)) ||
          (m1==0 && m2==0) ||
          (isFinite(m1)&&isFinite(m2)&&Math.min(m1 / m2, m2/m1)<EPS1)){
           //slopes are equal
@@ -284,12 +286,12 @@
            }
         }
         else {
-          if (isFinite(m1)&&isfinite(m2)&&!(m1==m2)){
+          if (isFinite(m1)&&isfinite(m2)&&m1!=m2){
           return [(b2 - b1)/(m1 - m2), (m2*b1 - m1*b2)/(m2 - m1)];
           }
           else {
             if (!isFinite(m1)){
-              return [b1,m2^b1+b2];
+              return [b1,m2*b1+b2];
             }
             if (!isfinite(m2)){
               return [b2, m1*b2+b1];
