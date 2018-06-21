@@ -228,7 +228,6 @@
       var angle = Math.atan((y1 - y2)/(x2 - x1));
       angle *= 180/Math.Pi;
     }
-
     function isParallelEdges(indexEdge1, indexEdge2, fold){
       var EPS = .05;
       return Math.abs(edgeAngle(indexEdge1, fold) - edgeAngle(indexEdge2, fold)) < EPS;
@@ -244,10 +243,10 @@
         }
       }
       else {
-        console.log('intersection');
-      }
+      // NOT parallel
+
       return [(b2 - b1)/(m1 - m2), (m2*b1 - m1*b2)/(m2 - m1)];
-    }
+    }}
   function lineFromPointandSlope(x1, y1, m){
     return [m, y1-m*x1, [[0, y1-m*x1], [x1, y1]]];
   }
