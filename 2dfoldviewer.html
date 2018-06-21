@@ -273,9 +273,10 @@
     }
     function intersectionOfTwoLines(m1, b1, m2, b2){
       // are slopes equal if so are lines parallel
+      var EPS = .95;
       if ((!isFinite(m1)&&!isFinite(m2)) ||
          (m1==0 && m2==0) ||
-         (isFinite(m1)&&isFinite(m2)&&Math.min(m1 / m2, m2/m1)<EPS1)){
+         (isFinite(m1)&&isFinite(m2)&&Math.min(m1 / m2, m2/m1)>EPS)){
           //slopes are equal
           if ( Math.abs(b1-b2)< 5)
           {
