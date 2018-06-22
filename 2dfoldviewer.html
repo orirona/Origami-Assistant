@@ -152,8 +152,6 @@
       var y3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][1];
       var x4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][0];
       var y4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][1];
-      var x5 = x2;
-      var y5 = y2;
       var line1 = lineFromEdge(indexEdgeOne, fold);
       var line2 = lineFromEdge(indexEdgeTwo, fold);
       var pt = intersectionOfTwoLines(line1[0], line1[1], line2[0], line2[1]);
@@ -190,10 +188,10 @@
              }
              else{
              //distance from intersection to edgeOne endpoints
-             var dist1 = distance(pt[0], pt[1], x1, y1);
-             var dist2 = distance(pt[0], pt[1], x2, y2);
-               if ((dist1 < EPS && dist2 < EPS ) ||
-                 (dist3 < EPS && dist4 < EPS )){
+               var dist1 = distance(pt[0], pt[1], x1, y1);
+               var dist2 = distance(pt[0], pt[1], x2, y2);
+              if ((dist1 < EPS && dist2 < EPS ) ||
+                  (dist3 < EPS && dist4 < EPS )){
                //dont fold edge of length 0
                 }
                 else {
@@ -230,21 +228,21 @@
                   else {
                   // dist2<dist1
                   if (!isFinite(m1)&&isFinite(m2)){
-                  var a = 1 + m2*m2;
-                  var b = 2*b2*m2
-                         -2*pt[1]*m2
-                         -2*pt[0];
-                  var c = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]
-                          +b2*b2 - dist1*dist1;
-                      x = (-b + Math.sqrt(b*b_4*a*c))/(2*a);
-                      y = m2*x +b;
-                      foldPointToPoint(x1,y1, x, y, fold, history);
-                  }
-                  else{
-                   if (!isFinite(m2)){
-                     foldPointToPoint(x1, y1, b2, pt[1] + dist2, fold, history);
+                     var a = 1 + m2*m2;
+                     var b = 2*b2*m2
+                            -2*pt[1]*m2
+                            -2*pt[0];
+                     var c = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]
+                             +b2*b2 - dist1*dist1;
+                         x = (-b + Math.sqrt(b*b-4*a*c))/(2*a);
+                         y = m2*x +b;
+                         foldPointToPoint(x1,y1, x, y, fold, history);
                    }
                    else{
+                     if (!isFinite(m2)){
+                       foldPointToPoint(x1, y1, b2, pt[1] + dist2, fold, history);
+                     }
+                     else {
                  // m1, m2 finite
                      var a = 1 + m2*m2;
                      var b = 2*(m2*b2-pt[0]-m2*pt[1]);
@@ -255,11 +253,10 @@
                          y = m2*x + b2;
                          foldPointToPoint(x1, y1, x, y, fold, history);
                      }
-}
-}
-                  }
-
+                 }
+               }
               }
+            }
         }
       }
       }
@@ -313,7 +310,8 @@
       // NOT parallel
 
       return [(b2 - b1)/(m1 - m2), (m2*b1 - m1*b2)/(m2 - m1)];
-    }}
+    }
+  }
   function lineFromPointandSlope(x1, y1, m){
     return [m, y1-m*x1, [[0, y1-m*x1], [x1, y1]]];
   }
