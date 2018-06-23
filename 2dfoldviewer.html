@@ -16,6 +16,7 @@
   <script>
     var vertexIndex = 0;
     console.log('test');
+    document.writeln('text sVG');
     var silhouette = [];
     var fold, foldBackup;
     document.getElementById('fileInput').addEventListener('change', selectFile, false);
@@ -68,6 +69,7 @@
 
     function draw(fold, svg) {
       console.log('test');
+      document.writeln('test draw');
       while(svg.lastChild) {
         svg.removeChild(svg.lastChild);
       }
@@ -165,7 +167,7 @@
         else{
           if (m1 == m2){
             // empty intersection:  two different parallel lines
-            if(m1 == 0){
+            if(m1 === 0){
               x5 = x1;
               y5 = b2;
             }
@@ -198,14 +200,13 @@
                   if (dist1 < dist2){
                  // x2,y2 farthes from intersection
                    if (!isFinite(m1)&&isFinite(m2)){
-                   var a = 1 + m2*m2;
-                   var b = 2*b2*m2
+                   var b3 = 2*b2*m2
                           -2*pt[1]*m2
                           -2*pt[0];
-                   var c = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]
+                   var c1 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]
                            +b2*b2 - dist2*dist2;
-                       x = (-b + Math.sqrt(b*b_4*a*c))/(2*a);
-                       y = m2*x +b;
+                       x = (-b3 + Math.sqrt(b3*b3-4*a1*c1))/(2*a1);
+                       y = m2*x +b2;
                        foldPointToPoint(x2,y2, x, y, fold, history);
                    }
                    else{
@@ -214,12 +215,12 @@
                     }
                     else{
                   // m1, m2 finite
-                      var a = 1 + m2*m2;
-                      var b = 2*(m2*b2-pt[0]-m2*pt[1]);
-                      var c = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
+                      var a2 = 1 + m2*m2;
+                      var b4 = 2*(m2*b2-pt[0]-m2*pt[1]);
+                      var c2 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
                              - 2*b2*pt[1]-2*b2*pt[1]
                              - dist2*dist2;
-                          x =(-b + Math.sqrt(b*b - 4*a*c))/(2*a);
+                          x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
                           y = m2*x + b2;
                           foldPointToPoint(x2, y2, x, y, fold, history);
                       }
@@ -228,14 +229,14 @@
                   else {
                   // dist2<dist1
                   if (!isFinite(m1)&&isFinite(m2)){
-                     var a = 1 + m2*m2;
-                     var b = 2*b2*m2
+                     var a3 = 1 + m2*m2;
+                     var b5 = 2*b2*m2
                             -2*pt[1]*m2
                             -2*pt[0];
-                     var c = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]
+                     var c3 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]
                              +b2*b2 - dist1*dist1;
-                         x = (-b + Math.sqrt(b*b-4*a*c))/(2*a);
-                         y = m2*x +b;
+                         x = (-b5 + Math.sqrt(b5*b5-4*a5*c5))/(2*a5);
+                         y = m2*x +b2;
                          foldPointToPoint(x1,y1, x, y, fold, history);
                    }
                    else{
@@ -244,20 +245,19 @@
                      }
                      else {
                  // m1, m2 finite
-                     var a = 1 + m2*m2;
-                     var b = 2*(m2*b2-pt[0]-m2*pt[1]);
-                     var c = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
+                     var a6 = 1 + m2*m2;
+                     var b6 = 2*(m2*b2-pt[0]-m2*pt[1]);
+                     var c6 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
                             - 2*b2*pt[1]-2*b2*pt[1]
                             - dist1*dist1;
-                         x =(-b + Math.sqrt(b*b - 4*a*c))/(2*a);
+                         x =(-b6 + Math.sqrt(b6*b6 - 4*a6*c6))/(2*a6);
                          y = m2*x + b2;
                          foldPointToPoint(x1, y1, x, y, fold, history);
                      }
                  }
                }
               }
-            }
-        }
+
       }
       }
     }
@@ -306,16 +306,21 @@
           }
         }
       }
-      else {
-      // NOT parallel
-
-      return [(b2 - b1)/(m1 - m2), (m2*b1 - m1*b2)/(m2 - m1)];
     }
   }
   function lineFromPointandSlope(x1, y1, m){
-    return [m, y1-m*x1, [[0, y1-m*x1], [x1, y1]]];
+  if (!isfinite(m)){
+    return [m,x1,[[x1, y1], [x1, y1+10]]];
   }
-
+  else{
+    if (m===0){
+      return [0, y1, [[x1, y1], [x1+10, y1]]]
+    }
+    else{
+    return [m, y1-m*x1, [[0, y1-m*x1], [x1, y1]]];]
+    }
+  }
+}
     function makeSilhouette(fold){
       var visited = [];
       var silhouette = [];
