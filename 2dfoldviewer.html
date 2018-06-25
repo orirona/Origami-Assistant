@@ -144,8 +144,6 @@
       }
       fold.faces_vertices.reverse();
     }
-
-
     function foldEdgeToEdge(indexEdgeOne, indexEdgeTwo, fold, history){
                var x1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][0];
                var y1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][1];
@@ -225,6 +223,8 @@
                                    y = m2*x + b2;
                                    foldPointToPoint(x2, y2, x, y, fold, history);
                              }}}}}}}}}}}
+
+
 
     function edgeAngle(indexEdge, fold){
       x1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][0];
