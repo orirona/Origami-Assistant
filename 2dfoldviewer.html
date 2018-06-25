@@ -201,9 +201,9 @@
                 else {
                   if (dist1 < dist2){
                  // x2,y2 farthes from intersection
-                    c1 = dist2;}
+                    c = dist2;}
                     else{
-                      c1 = dist1;
+                      c = dist1;
                     };
                    if (!isFinite(m1)&&isFinite(m2)){
                    var a1 = 1 + m2*m2;
@@ -211,7 +211,7 @@
                           -2*pt[1]*m2
                           -2*pt[0];
                    var c1 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]
-                           +b2*b2 - dist2*dist2;
+                           +b2*b2 - c*c;
                        x = (-b3 + Math.sqrt(b3*b3-4*a1*c1))/(2*a1);
                        y = m2*x +b2;
                        foldPointToPoint(x2,y2, x, y, fold, history);
@@ -226,7 +226,7 @@
                       var b4 = 2*(m2*b2-pt[0]-m2*pt[1]);
                       var c2 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
                              - 2*b2*pt[1]-2*b2*pt[1]
-                             - c1;
+                             - c*c;
                           x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
                           y = m2*x + b2;
                           foldPointToPoint(x2, y2, x, y, fold, history);
@@ -236,11 +236,7 @@
 
                  }
                }
-              }
 
-      }
-      }
-    }
 
     function edgeAngle(indexEdge, fold){
       x1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][0];
