@@ -145,96 +145,86 @@
       fold.faces_vertices.reverse();
     }
 
-    function foldEdgeToEdge(indexEdgeOne, indexEdgeTwo, fold, history){
-      var x1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][0];
-      var y1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][1];
-      var x2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][0];
-      var y2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][1];
-      var x3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][0];
-      var y3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][1];
-      var x4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][0];
-      var y4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][1];
-      var line1 = lineFromEdge(indexEdgeOne, fold);
-      var line2 = lineFromEdge(indexEdgeTwo, fold);
-      var pt = intersectionOfTwoLines(line1[0], line1[1], line2[0], line2[1]);
-      var m1 = line1[0];
-      var b1 = line1[1];
-      var m2 = line2[0];
-      var b2 = line2[1];
-      if (m1 == m2 && b1 == b2){
-              // coincident lines no folding
-            }
-        else{
-          if (m1 == m2){
-            // empty intersection:  two different parallel lines
-            if(m1 === 0){
-              x5 = x1;
-              y5 = b2;
-            }
-            else if(!isFinite(m1)){
-              x5 = b2;
-              y5 = y1;
-            }
-            else{
-              b3 = y1 - 1/m1*x1;
-              x5 = (b3 - b2)/(m1 - 1/m1);
-              y5 = m1*x5 + b2;
-            }
-            //console.log("x1: , " + x1 + "y1: , " + y1 + "x5: " + x5 + "y5: " + y5);
-            foldPointToPoint(x1, y1, x5, y5, fold, history);
-           }
-           else {
-             if (pt[0] == []){
-             // vertical parallel lines
-              foldPointToPoint(x1, y1, x2, y1, fold, history);
-             }
-             else{
-             //distance from intersection to edgeOne endpoints
-               var dist1 = distance(pt[0], pt[1], x1, y1);
-               var dist2 = distance(pt[0], pt[1], x2, y2);
-              var dist3 = distance(pt[0], pt[1], x3, y3);
-              var dist4 = distance(pt[0], pt[1], x4, y4);
-              if ((dist1 < EPS && dist2 < EPS ) ||
-                  (dist3 < EPS && dist4 < EPS )){
-               //dont fold edge of length 0
-                }
-                else {
-                  if (dist1 < dist2){
-                 // x2,y2 farthes from intersection
-                    c = dist2;}
-                    else{
-                      c = dist1;
-                    };
-                   if (!isFinite(m1)&&isFinite(m2)){
-                   var a1 = 1 + m2*m2;
-                   var b3 = 2*b2*m2
-                          -2*pt[1]*m2
-                          -2*pt[0];
-                   var c1 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]
-                           +b2*b2 - dist2*dist2;
-                       x = (-b3 + Math.sqrt(b3*b3-4*a1*c1))/(2*a1);
-                       y = m2*x +b2;
-                       foldPointToPoint(x2,y2, x, y, fold, history);
-                   }
-                   else{
-                    if (!isFinite(m2)){
-                      foldPointToPoint(x2, y2, b2, pt[1] + dist2, fold, history);
-                    }
-                    else{
-                  // m1, m2 finite
-                      var a2 = 1 + m2*m2;
-                      var b4 = 2*(m2*b2-pt[0]-m2*pt[1]);
-                      var c2 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
-                             - 2*b2*pt[1]-2*b2*pt[1]
-                             - c*c;
-                          x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
-                          y = m2*x + b2;
-                          foldPointToPoint(x2, y2, x, y, fold, history);
-                      }
-}
-}
 
-                 }
+    function foldEdgeToEdge(indexEdgeOne, indexEdgeTwo, fold, history){
+               var x1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][0];
+               var y1 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][0]][1];
+               var x2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][0];
+               var y2 = fold.vertices_coords[fold.edges_vertices[indexEdgeOne][1]][1];
+               var x3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][0];
+               var y3 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][0]][1];
+               var x4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][0];
+               var y4 = fold.vertices_coords[fold.edges_vertices[indexEdgeTwo][1]][1];
+               var line1 = lineFromEdge(indexEdgeOne, fold);
+               var line2 = lineFromEdge(indexEdgeTwo, fold);
+               var pt = intersectionOfTwoLines(line1[0], line1[1], line2[0], line2[1]);
+               var m1 = line1[0];
+               var b1 = line1[1];
+               var m2 = line2[0];
+               var b2 = line2[1];
+               if (m1 == m2 && b1 == b2){
+                       // coincident lines no folding
+                     }
+                 else{
+                   if (m1 == m2){
+                     // empty intersection:  two different parallel lines
+                     if(m1 === 0){
+                       foldPointToPoint(x1, y1, x1, b2, fold, history);
+                     }
+                     else{
+                      if(!isFinite(m1)){
+                       foldPointToPoint(x1, y1, b2, y1, fold, history);
+                      }
+                       else{
+                        var b6 = y1 - 1/m1*x1;
+                        //console.log("x1: , " + x1 + "y1: , " + y1 + "x5: " + x5 + "y5: " + y5);
+                        foldPointToPoint(x1, y1, (b6-b2)/(m1-1/m1), m1*(b6-b2)/(m1-1/m1)+b2, fold, history);
+                       }
+                      }
+                    else {
+                    if (pt[0] == []){
+                      // vertical parallel lines
+                       foldPointToPoint(x1, y1, x2, y1, fold, history);
+                      }
+                      else{
+                      //distance from intersection to edgeOne endpoints
+                        var dist1 = distance(pt[0], pt[1], x1, y1);
+                        var dist2 = distance(pt[0], pt[1], x2, y2);
+                        var dist3 = distance(pt[0], pt[1], x3, y3);
+                        var dist4 = distance(pt[0], pt[1], x4, y4);
+                       if ((dist1 < EPS && dist2 < EPS ) ||
+                           (dist3 < EPS && dist4 < EPS )){
+                        //dont fold edge of length 0
+                         }
+                         else {
+                           if (dist1 < dist2){
+                          // x2,y2 farthes from intersection
+                             c = dist2;
+                           }
+                             else{
+                               c = dist1;
+                             }
+                            if (!isFinite(m1)&&isFinite(m2)){
+                            var a1 = 1 + m2*m2;
+                            var b3 = 2*b2*m2-2*pt[1]*m2-2*pt[0];
+                            var c1 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]+b2*b2 - c*c;
+                                x = (-b3 + Math.sqrt(b3*b3-4*a1*c1))/(2*a1);
+                                y = m2*x +b2;
+                                foldPointToPoint(x2,y2, x, y, fold, history);
+                            }
+                            else {
+                             if (!isFinite(m2)){
+                               foldPointToPoint(x2, y2, b2, pt[1] + c, fold, history);
+                             }
+                             else{
+                           // m1, m2 finite
+                               var a2 = 1 + m2*m2;
+                               var b4 = 2*(m2*b2-pt[0]-m2*pt[1]);
+                               var c2 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2-2*b2*pt[1]-c*c;
+                                   x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
+                                   y = m2*x + b2;
+                                   foldPointToPoint(x2, y2, x, y, fold, history);
+                             }}}}}}}}}}}
 
     function edgeAngle(indexEdge, fold){
       x1 = fold.vertices_coords[fold.edges_vertices[indexEdge][0]][0];
