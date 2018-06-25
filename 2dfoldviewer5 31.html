@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang = "en">
+<head>
+  <meta charset = "UTF-8">
+  <title>Origami Assistant</title>
+</head>
+<body>
+  <input type="file" id="fileInput" name="foldFile" accept=".fold"/>
+  <svg version="1.1"
+     baseProfile="full"
+     width="600" height="600"
+     xmlns="http://www.w3.org/2000/svg"
+     id="svg">
+  <rect x="0" y="0" width="600" height="600" fill="none" stroke="black" stroke-width = "16"/>
+  <script>
+    var vertexIndex = 0;
+    var silhouette = [];
+    var fold;
+    document.getElementById('fileInput').addEventListener('change', selectFile, false);
+    function selectFile(evt) {
+      var file = evt.target.files[0];
+      vertexIndex = 0;
+      silhouette = [];
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var text = reader.result;
+        fold = JSON.parse(text);
+        initFoldFile(fold);
+        var history = [];
+        draw(fold, document.getElementsByTagName('svg')[0]);
+        silhouette = makeSilhouette(fold);
+        drawHighlight(0);
+        console.log(pointInFace(4, 0, fold));
+        for(var i = 0; i < silhouette.length; ++i){
+          console.log(silhouette[i] + " " + findAngle(300, 300, silhouette[i][0], silhouette[i][1]));
+        }
+      }
+      reader.readAsText(file);
+    }
+
+    document.onkeypress = function (evt) {
+      if(evt.charCode === 110){
+        ++vertexIndex;
+        drawHighlight(vertexIndex % silhouette.length);
+      }
+    };
+
+    function draw(fold, svg) {  
+      while(svg.lastChild) {
+        svg.removeChild(svg.lastChild);
+      }
+      var vertices = fold.vertices_coords;
+      //assumes they are sorted
+      var faces = fold.faces_vertices;
+      for(var i = 0; i < faces.length; ++i){
+        var d = "";
+        for(var j = 0; j < faces[i].length; ++j){
+          var location = vertices[faces[i][j]][0] + " " + vertices[faces[i][j]][1];
+          if(d === ""){
+            d = "M" + location + " ";
+          }
+          else{
+            d += "L" + location + " ";
+          }
+        }  
+        appendPath(d, i, svg, fold.colors[i]);
+      }
+      appendFrame(svg);
+    }
+
+    function initFoldFile(fold){
+      if(fold.colors === []){
+        for(var i = 0; i < fold.faces_vertices.length; ++i){
+          fold.colors.push(false);
+        } 
+      } 
+    }
+
+    function appendPath(d, i, svg, color){
+        var path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+        path.setAttribute("d",d);
+        path.setAttribute("fill", "rgb(" + (128 - 60 * i) + (color ? 0 : 120) + "," + (223 - 8 * i) + "," + (color ? 255 : 120) + ")");
+        path.setAttribute("stroke-alignment", "inner");
+        path.setAttribute("stroke-width", "2");
+        path.setAttribute("stroke", "black");
+        svg.appendChild(path);
+    }
+
+    function appendFrame(svg){
+        var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+        rect.setAttribute("x", 0);
+        rect.setAttribute("y", 0);
+        rect.setAttribute("width", 600);
+        rect.setAttribute("height", 600);
+        rect.setAttribute("fill", "none");
+        rect.setAttribute("stroke", "black");
+        rect.setAttribute("stroke-width", "16");
+        svg.appendChild(rect);
+    }
+
+    function translate(xShift, yShift, fold) {
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
+        fold.vertices_coords[i][0] += xShift;
+        fold.vertices_coords[i][1] += yShift;
+      }
+    }
+
+    function scale(factor, fold) {
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
+        fold.vertices_coords[i][0] *= factor;
+        fold.vertices_coords[i][1] *= factor;
+      }
+    }
+
+    function flip(fold, history){
+      history.push(fold);
+      for(var i = 0; i < fold.colors.length; ++i){
+        fold.colors[i] = !fold.colors[i];
+      }
+      fold.faces_vertices.reverse();
+    }
+    
+    //fold edge one to edge two
+    function foldEdgeToEdge(indexEdgeOne, indexEdgeTwo, fold, history){
+      history.push(fold);
+      //color
+      //label
+      //update face order
+      //refine
+      var edgeOne = fold.edges_vertices[indexEdgeOne];
+      var edgeTwo = fold.edges_vertices[indexEdgeTwo];
+      var vertices = fold.vertices_coords.slice();
+      fold.vertices_coords[edgeOne[0]] = [(vertices[edgeOne[1]][0] + vertices[edgeTwo[0]][0])/2, (vertices[edgeOne[1]][1] + vertices[edgeTwo[0]][1])/2];
+      fold.vertices_coords[edgeOne[1]] = [(vertices[edgeOne[0]][0] + vertices[edgeTwo[1]][0])/2, (vertices[edgeOne[0]][1] + vertices[edgeTwo[1]][1])/2];
+      //fold.edges_assignment[indexEdgeOne] = "M"; *find a way to differentiate*
+      fold.vertices_coords.push(vertices[edgeTwo[0]]);
+      fold.vertices_coords.push(vertices[edgeTwo[1]]);
+      fold.edges_vertices.push([fold.vertices_coords.length - 2, fold.vertices_coords.length - 1]);
+      fold.edges_vertices.push([fold.vertices_coords.length - 1, edgeOne[0]]);
+      fold.edges_vertices.push([fold.vertices_coords.length - 2, edgeOne[1]]);
+      fold.faces_vertices.push([fold.vertices_coords.length - 1, edgeOne[1], edgeOne[0], fold.vertices_coords.length - 2]);
+      //colors.length - 1 *should* be index of face that contains edges
+      fold.colors.push(!fold.colors[fold.colors.length - 1]);
+    }
+
+    function foldVertexToReferencePoint(fold, history){
+      history.push(fold);
+    }
+
+    function makeSilhouette(fold){
+      var visited = [];
+      var silhouette = [];
+      for(var i = 0; i < fold.faces_vertices.length; ++i){
+        for(var j = 0; j < fold.faces_vertices[i].length; ++j){
+          var vertex = fold.faces_vertices[i][j];
+          if(!visited.includes(vertex) && !contains(silhouette, fold.vertices_coords[vertex])){
+            if(!pointInFace(vertex, i, fold)){
+              silhouette.push(fold.vertices_coords[vertex]);
+            }
+            visited.push(vertex);
+          }
+        }
+      }
+      var xMinIndex = 0;
+      var xMaxIndex = 0;
+      var yMinIndex = 0;
+      var yMaxIndex = 0; 
+      for(var i = 0; i < silhouette.length; ++i){
+        if(silhouette[i][0] < silhouette[xMinIndex][0]){
+          xMinIndex = i;
+        }
+        if(silhouette[i][0] > silhouette[xMaxIndex][0]){
+          xMaxIndex = i;
+        }
+        if(silhouette[i][1] < silhouette[yMinIndex][1]){
+          yMinIndex = i;
+        }
+        if(silhouette[i][1] > silhouette[yMaxIndex][1]){
+          yMaxIndex = i;
+        }
+      }
+      var centerX = (silhouette[xMinIndex][0] + silhouette[xMaxIndex][0]) / 2;
+      var centerY = (silhouette[yMinIndex][1] + silhouette[yMaxIndex][1]) / 2;
+      silhouette.sort(function(a, b){
+        if(findAngle(centerX, centerY, a[0], a[1]) > findAngle(centerX, centerY, b[0], b[1])){
+          return 1;
+        }  
+        return -1;
+      });
+      return silhouette;
+    }
+
+    function pointInFace(vertex, face, fold){
+      for(var i = 0; i < fold.faces_edges.length; ++i){
+        if(face != i){
+          var count = 0;
+          for(var j = 0; j < fold.faces_edges[i].length; ++j){
+            var y = fold.vertices_coords[vertex][1];
+            var cord1 = fold.vertices_coords[fold.edges_vertices[fold.faces_edges[i][j]][0]];
+            var cord2 = fold.vertices_coords[fold.edges_vertices[fold.faces_edges[i][j]][1]];
+            var m = (cord2[1] - cord1[1])/(cord2[0] - cord1[0]);
+            var x = (y + m * cord1[0] - cord1[1])/m;
+            var x1 = Math.min(cord1[0], cord2[0]);
+            var x2 = Math.max(cord1[0], cord2[0]);
+            if((x > x1 && x < x2 && x > fold.vertices_coords[vertex][0]) || !isFinite(x)){
+              ++count;
+            }
+          }
+          if(count % 2 == 1) return true;
+        }
+      }
+      return false;
+    }
+
+    function findAngle(x1, y1, x2, y2){
+      var angle = Math.atan((y1 - y2)/(x2 - x1));
+      angle *= 180/Math.PI;
+      if(x2 > x1 && y2 > y1){
+        angle = angle += 360;
+      }
+      if(x2 < x1 && y2 > y1){
+        angle += 180;
+      }
+      if(x2 < x1 && y2 <= y1){
+        angle += 180;
+      }
+      return angle;
+    }
+
+    function drawHighlight(index){
+      var svg = document.getElementsByTagName('svg')[0];
+      draw(fold, svg);
+      var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+      console.log(index);
+      circle.setAttribute("cx", silhouette[index][0]);
+      circle.setAttribute("cy", silhouette[index][1]);
+      circle.setAttribute("r", 30);
+      circle.setAttribute("fill", "yellow");
+      circle.setAttribute("opacity", .5);
+      svg.appendChild(circle);
+    }
+
+    function contains(array, item){
+      for(var i = 0; i < array.length; ++i){
+        if(item[0] == array[i][0] && item[1] == array[i][1]){
+          return true;
+        }
+      }
+      return false;
+    }
+  </script>
+  </svg>
+</body>
+</html>
+
