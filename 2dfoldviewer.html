@@ -192,6 +192,8 @@
              //distance from intersection to edgeOne endpoints
                var dist1 = distance(pt[0], pt[1], x1, y1);
                var dist2 = distance(pt[0], pt[1], x2, y2);
+              var dist3 = distance(pt[0], pt[1], x3, y3);
+              var dist4 = distance(pt[0], pt[1], x4, y4);
               if ((dist1 < EPS && dist2 < EPS ) ||
                   (dist3 < EPS && dist4 < EPS )){
                //dont fold edge of length 0
@@ -199,6 +201,10 @@
                 else {
                   if (dist1 < dist2){
                  // x2,y2 farthes from intersection
+                    c1 = dist2;}
+                    else{
+                      c1 = dist1;
+                    };
                    if (!isFinite(m1)&&isFinite(m2)){
                    var a1 = 1 + m2*m2;
                    var b3 = 2*b2*m2
@@ -220,41 +226,14 @@
                       var b4 = 2*(m2*b2-pt[0]-m2*pt[1]);
                       var c2 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
                              - 2*b2*pt[1]-2*b2*pt[1]
-                             - dist2*dist2;
+                             - c1;
                           x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
                           y = m2*x + b2;
                           foldPointToPoint(x2, y2, x, y, fold, history);
                       }
 }
 }
-                  else {
-                  // dist2<dist1
-                  if (!isFinite(m1)&&isFinite(m2)){
-                     var a3 = 1 + m2*m2;
-                     var b5 = 2*b2*m2
-                            -2*pt[1]*m2
-                            -2*pt[0];
-                     var c3 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]
-                             +b2*b2 - dist1*dist1;
-                         x = (-b5 + Math.sqrt(b5*b5-4*a5*c5))/(2*a5);
-                         y = m2*x +b2;
-                         foldPointToPoint(x1,y1, x, y, fold, history);
-                   }
-                   else{
-                     if (!isFinite(m2)){
-                       foldPointToPoint(x1, y1, b2, pt[1] + dist2, fold, history);
-                     }
-                     else {
-                 // m1, m2 finite
-                     var a6 = 1 + m2*m2;
-                     var b6 = 2*(m2*b2-pt[0]-m2*pt[1]);
-                     var c6 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2
-                            - 2*b2*pt[1]-2*b2*pt[1]
-                            - dist1*dist1;
-                         x =(-b6 + Math.sqrt(b6*b6 - 4*a6*c6))/(2*a6);
-                         y = m2*x + b2;
-                         foldPointToPoint(x1, y1, x, y, fold, history);
-                     }
+
                  }
                }
               }
