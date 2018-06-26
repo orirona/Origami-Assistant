@@ -38,7 +38,7 @@ document.writeln('                                  ');
       var reader = new FileReader();
       reader.onload = function(e) {
         document.writeln('test3');
-        console.log('test3'(;
+        console.log('test3');
         var text = reader.result;
         fold = JSON.parse(text);
         foldBackup = JSON.parse(JSON.stringify(fold));
