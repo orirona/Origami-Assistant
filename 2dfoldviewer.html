@@ -179,6 +179,7 @@
                     else {
                     if (pt[0] == []){
                       // vertical parallel lines
+                      console.log('vertical parallel lines');
                        foldPointToPoint(x1, y1, x2, y1, fold, history);
                       }
                       else{
@@ -206,9 +207,11 @@
                           var c1 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]+b2*b2 - c*c;
                               x = (-b3 + Math.sqrt(b3*b3-4*a1*c1))/(2*a1);
                               y = m2*x +b2;
+                              console.log('m1 infinite m2 finite' + indexEdgeOne + IndexEdgeTwo);
                               foldPointToPoint(x2,y2, x, y, fold, history);
                           }
                           else if (!isFinite(m2)){
+                              console.log('m2 infinite', indexEdgeTwo);
                              foldPointToPoint(x2, y2, b2, pt[1] + c, fold, history);
                            }
                            else{
@@ -218,6 +221,7 @@
                              var c2 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2-2*b2*pt[1]-c*c;
                                  x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
                                  y = m2*x + b2;
+                                console.log('m1,m2 finite')
                                  foldPointToPoint(x2, y2, x, y, fold, history);
                              }}}}}}}
 
