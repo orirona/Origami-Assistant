@@ -109,7 +109,7 @@ document.writeln('                                  ');
 
     function initFoldFile(fold){
       if(fold.colors === []){
-        for(var i = 0; i < fold.faces_vertices.length, ++i){
+        for(var i = 0; i < fold.faces_vertices.length; ++i){
           fold.colors.push(false);
         }
       }
@@ -138,14 +138,14 @@ document.writeln('                                  ');
     }
 
     function translate(xShift, yShift, fold) {
-      for(var i = 0; i < fold.vertices_coords.length, ++i){
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
         fold.vertices_coords[i][0] += xShift;
         fold.vertices_coords[i][1] += yShift;
       }
     }
 
     function scale(factor, fold) {
-      for(var i = 0; i < fold.vertices_coords.length, ++i){
+      for(var i = 0; i < fold.vertices_coords.length; ++i){
         fold.vertices_coords[i][0] *= factor;
         fold.vertices_coords[i][1] *= factor;
       }
@@ -153,7 +153,7 @@ document.writeln('                                  ');
 
     function flip(fold, history){
       history.push(fold);
-      for(var i = 0; i < fold.colors.length, ++i){
+      for(var i = 0; i < fold.colors.length; ++i){
         fold.colors[i] = !fold.colors[i];
       }
       fold.faces_vertices.reverse();
@@ -304,8 +304,8 @@ document.writeln('                                  ');
     function makeSilhouette(fold){
       var visited = [];
       var silhouette = [];
-      for(var i = 0; i < fold.faces_vertices.length, ++i){
-        for(var j = 0; j < fold.faces_vertices[i].length, ++j){
+      for(var i = 0; i < fold.faces_vertices.length; ++i){
+        for(var j = 0; j < fold.faces_vertices[i].length; ++j){
           var vertex = fold.faces_vertices[i][j];
           if(!includes(visited, vertex) && !contains(silhouette, fold.vertices_coords[vertex])){
             if(!pointInFace(vertex, i, fold)){
