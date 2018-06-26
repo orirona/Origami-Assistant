@@ -5,7 +5,14 @@
   <title>Origami Assistant</title>
 </head>
 <body>
+  <script>
+  function test(){
+    document.write('button response');
+  }
+  </script>h
+  <input type="button" onclick=testing.html />
   <input type="file" id="fileInput" name="foldFile" accept=".fold"/>
+
   <div>
   <svg version="1.1"
      baseProfile="full"
@@ -179,7 +186,7 @@
                         foldPointToPoint(x1, y1, (b6-b2)/(m1-1/m1), m1*(b6-b2)/(m1-1/m1)+b2, fold, history);
                        }
                       }
-                    }  
+                    }
                     else {
                     if (pt[0] == []){
                       // vertical parallel lines
@@ -191,6 +198,7 @@
                         var dist2 = distance(pt[0], pt[1], x2, y2);
                         var dist3 = distance(pt[0], pt[1], x3, y3);
                         var dist4 = distance(pt[0], pt[1], x4, y4);
+                        var EPS = 5;
                        if ((dist1 < EPS && dist2 < EPS ) ||
                            (dist3 < EPS && dist4 < EPS )){
                         //dont fold edge of length 0
@@ -223,7 +231,7 @@
                                    x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
                                    y = m2*x + b2;
                                    foldPointToPoint(x2, y2, x, y, fold, history);
-                             }}}}}}}}}}}
+                             }}}}}}}}
 
 
 
