@@ -45,26 +45,22 @@
     };
 
     document.onmousedown = function(evt){
+      var boundingRect = document.getElementsByTagName('rect')[0].getBoundingClientRect();
+      var nearestVertex = findNearestVertex(evt.clientX - boundingRect.left, evt.clientY - boundingRect.top, fold);
       function onmousemove(evt) {
         fold = JSON.parse(JSON.stringify(foldBackup));
-        foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
-     draw(fold, document.getElementsByTagName('svg')[0]);
+        silhouette = makeSilhouette(fold);
+        foldPointToPoint(nearestVertex[0],nearestVertex[1],evt.clientX, evt.clientY, fold, []);
+        draw(fold, document.getElementsByTagName('svg')[0]);   
       }
-      document.addEventListener('mousemove', onmousemove);
+      if(nearestVertex != null){
+        document.addEventListener('mousemove', onmousemove);  
+      }
       document.onmouseup = function() {
-        //foldEdgeToEdge(2,1,fold,[]);
-        //foldPointToPoint(0,0,600,600,fold,[]);
-        foldBackup = JSON.parse(JSON.stringify(fold));
         document.removeEventListener('mousemove', onmousemove);
+        foldBackup = JSON.parse(JSON.stringify(fold));
       };
     };
-
-    // document.onmouseup = function(evt){
-    //   foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
-    //   foldBackup = JSON.parse(JSON.stringify(fold));
-    //   silhouette = makeSilhouette(fold);
-    //   draw(fold, document.getElementsByTagName('svg')[0]);
-    // };
 
     function draw(fold, svg) {
       while(svg.lastChild) {
@@ -695,6 +691,10 @@
       //TODO: Implement
     }
 
+    function findDistance(x1, y1, x2, y2){
+      return Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+    }
+    
     function findNearestVertex(x, y, fold){
       var maxDistance = 25; // the max distance to select a vertex
       var minDistance = 10000;
