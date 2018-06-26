@@ -7,7 +7,7 @@
 <body>
   <script>
   function testing(){
-    document.t1.writeln('button response');
+    document.t1.writeln('change response');
   }
   </script>
 document.writeln('                                  ');
@@ -26,7 +26,7 @@ document.writeln('                                  ');
     var vertexIndex = 0;
   <input type='text' name='t2' />
     console.log('test');
-    document.writeln('text sVG');
+    document.writeln('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxtext sVG');
     var silhouette = [];
     var fold, foldBackup;
     document.getElementById('fileInput').addEventListener('change', selectFile, false);
@@ -37,6 +37,8 @@ document.writeln('                                  ');
       silhouette = [];
       var reader = new FileReader();
       reader.onload = function(e) {
+        document.writeln('test3');
+        console.log('test3'(;
         var text = reader.result;
         fold = JSON.parse(text);
         foldBackup = JSON.parse(JSON.stringify(fold));
@@ -81,6 +83,7 @@ document.writeln('                                  ');
     function draw(fold, svg) {
       console.log('test');
       document.writeln('test draw');
+      <input type='text' name='test4' />
       while(svg.lastChild) {
         svg.removeChild(svg.lastChild);
       }
