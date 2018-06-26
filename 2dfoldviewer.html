@@ -24,11 +24,13 @@ document.writeln('                                  ');
   <rect x="50" y="50" width="600" height="600" fill="none" stroke="black" stroke-width = "16"/>
   <script>
     var vertexIndex = 0;
+  <input type='text' name='t2' />
     console.log('test');
     document.writeln('text sVG');
     var silhouette = [];
     var fold, foldBackup;
     document.getElementById('fileInput').addEventListener('change', selectFile, false);
+    
     function selectFile(evt) {
       var file = evt.target.files[0];
       vertexIndex = 0;
