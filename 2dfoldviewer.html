@@ -52,10 +52,10 @@
         fold = JSON.parse(JSON.stringify(foldBackup));
         silhouette = makeSilhouette(fold);
         //foldPointToPoint(nearestVertex[0],nearestVertex[1],evt.clientX, evt.clientY, fold, []);
-        //draw(fold, document.getElementsByTagName('svg')[0]);   
+        //draw(fold, document.getElementsByTagName('svg')[0]);
       }
       if(nearestVertex != null){
-        document.addEventListener('mousemove', onmousemove);  
+        document.addEventListener('mousemove', onmousemove);
       }
       document.onmouseup = function() {
         document.removeEventListener('mousemove', onmousemove);
@@ -165,6 +165,7 @@
                      }
                      else{
                       if(!isFinite(m1)){
+                      console.log('m1 is infinite', indexEdgeOne);
                        foldPointToPoint(x1, y1, b2, y1, fold, history);
                       }
                        else{
