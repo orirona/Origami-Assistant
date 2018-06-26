@@ -5,28 +5,16 @@
   <title>Origami Assistant</title>
 </head>
 <body>
-  <script>
-  function testing(){
-    document.t1.value ='change response';
-  }
-  </script>
-document.writeln('                                  ');
-
   <input type="file" id="fileInput" name="foldFile" accept=".fold"/>
-  <input type="text" name="t1" onchange=testing() />
-
   <div>
   <svg version="1.1"
      baseProfile="full"
-     width="600" height="600"
+     width="800" height="800"
      xmlns="http://www.w3.org/2000/svg"
      id="svg">
-  <rect x="50" y="50" width="600" height="600" fill="none" stroke="black" stroke-width = "16"/>
+  <rect x="50" y="50" width="600" height="600" fill="none" stroke="black" stroke-width = "8"/>
   <script>
     var vertexIndex = 0;
-  <input type='text' name='t2' />
-    console.log('test');
-    document.writeln('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxtext sVG');
     var silhouette = [];
     var fold, foldBackup;
     document.getElementById('fileInput').addEventListener('change', selectFile, false);
@@ -37,8 +25,6 @@ document.writeln('                                  ');
       silhouette = [];
       var reader = new FileReader();
       reader.onload = function(e) {
-        document.writeln('test3');
-        console.log('test3');
         var text = reader.result;
         fold = JSON.parse(text);
         foldBackup = JSON.parse(JSON.stringify(fold));
@@ -82,8 +68,6 @@ document.writeln('                                  ');
 
     function draw(fold, svg) {
       console.log('test');
-      document.writeln('test draw');
-      <input type='text' name='test4' />
       while(svg.lastChild) {
         svg.removeChild(svg.lastChild);
       }
@@ -92,7 +76,7 @@ document.writeln('                                  ');
       var faces = fold.faces_vertices;
       for(var i = 0; i < faces.length; ++i){
         var d = "";
-        for(var j = 0; j < faces[i].length, ++j){
+        for(var j = 0; j < faces[i].length; ++j){
           var location = vertices[faces[i][j]][0] + " " + vertices[faces[i][j]][1];
           if(d === ""){
             d = "M" + location + " ";
@@ -215,30 +199,29 @@ document.writeln('                                  ');
                           // x2,y2 farthes from intersection
                              c = dist2;
                            }
-                             else{
-                               c = dist1;
-                             }
-                            if (!isFinite(m1)&&isFinite(m2)){
-                            var a1 = 1 + m2*m2;
-                            var b3 = 2*b2*m2-2*pt[1]*m2-2*pt[0];
-                            var c1 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]+b2*b2 - c*c;
-                                x = (-b3 + Math.sqrt(b3*b3-4*a1*c1))/(2*a1);
-                                y = m2*x +b2;
-                                foldPointToPoint(x2,y2, x, y, fold, history);
-                            }
-                            else {
-                             if (!isFinite(m2)){
-                               foldPointToPoint(x2, y2, b2, pt[1] + c, fold, history);
-                             }}
-                             else{
-                           // m1, m2 finite
-                               var a2 = 1 + m2*m2;
-                               var b4 = 2*(m2*b2-pt[0]-m2*pt[1]);
-                               var c2 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2-2*b2*pt[1]-c*c;
-                                   x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
-                                   y = m2*x + b2;
-                                   foldPointToPoint(x2, y2, x, y, fold, history);
-                             }}}}}}}}
+                           else{
+                             c = dist1;
+                           }
+                          if (!isFinite(m1)&&isFinite(m2)){
+                          var a1 = 1 + m2*m2;
+                          var b3 = 2*b2*m2-2*pt[1]*m2-2*pt[0];
+                          var c1 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]+b2*b2 - c*c;
+                              x = (-b3 + Math.sqrt(b3*b3-4*a1*c1))/(2*a1);
+                              y = m2*x +b2;
+                              foldPointToPoint(x2,y2, x, y, fold, history);
+                          }
+                          else if (!isFinite(m2)){
+                             foldPointToPoint(x2, y2, b2, pt[1] + c, fold, history);
+                           }
+                           else{
+                         // m1, m2 finite
+                             var a2 = 1 + m2*m2;
+                             var b4 = 2*(m2*b2-pt[0]-m2*pt[1]);
+                             var c2 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2-2*b2*pt[1]-c*c;
+                                 x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
+                                 y = m2*x + b2;
+                                 foldPointToPoint(x2, y2, x, y, fold, history);
+                             }}}}}}}
 
 
 
@@ -264,30 +247,28 @@ document.writeln('                                  ');
          (m1==0 && m2==0) ||
          (isFinite(m1)&&isFinite(m2)&&Math.min(m1 / m2, m2/m1)>EPS)){
           //slopes are equal
-          if ( Math.abs(b1-b2)< 5)
+          if (Math.abs(b1-b2)< 5)
           {
            return ['same line', 'same line'];
-           }
-          else {
-            return [[], []];
-           }
-        }
-        else {
-          if (isFinite(m1)&&isfinite(m2)&&m1!=m2){
-          return [(b2 - b1)/(m1 - m2), (m2*b1 - m1*b2)/(m2 - m1)];
           }
           else {
-            if (!isFinite(m1)){
-              return [b1,m2*b1+b2];
-            }
-            if (!isfinite(m2)){
-              return [b2, m1*b2+b1];
-            }
+            return [[], []];
+          }
+        }
+      else {
+        if (isFinite(m1)&&isfinite(m2)&&m1!=m2){
+        return [(b2 - b1)/(m1 - m2), (m2*b1 - m1*b2)/(m2 - m1)];
+        }
+        else {
+          if (!isFinite(m1)){
+            return [b1,m2*b1+b2];
+          }
+          if (!isfinite(m2)){
+            return [b2, m1*b2+b1];
           }
         }
       }
     }
-  }
   function lineFromPointandSlope(x1, y1, m){
   if (!isfinite(m)){
     return [m,x1,[[x1, y1], [x1, y1+10]]];
@@ -297,7 +278,7 @@ document.writeln('                                  ');
       return [0, y1, [[x1, y1], [x1+10, y1]]]
     }
     else{
-    return [m, y1-m*x1, [[0, y1-m*x1], [x1, y1]]];]
+    return [m, y1-m*x1, [[0, y1-m*x1], [x1, y1]]];
     }
   }
 }
@@ -733,6 +714,7 @@ document.writeln('                                  ');
         return [fold.vertices_coords[minDistanceIndex][0], fold.vertices_coords[minDistanceIndex][1]];
       }
       return null;
+    }
   </script>
   </svg>
   </div>
