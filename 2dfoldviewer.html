@@ -165,7 +165,7 @@
                      }
                  else{
                    if (m1 == m2){
-                     // empty intersection:  two different parallel lines
+                     if (true){// empty intersection:  two different parallel lines
                      if(m1 === 0){
                        foldPointToPoint(x1, y1, x1, b2, fold, history);
                      }
@@ -179,6 +179,7 @@
                         foldPointToPoint(x1, y1, (b6-b2)/(m1-1/m1), m1*(b6-b2)/(m1-1/m1)+b2, fold, history);
                        }
                       }
+                    }  
                     else {
                     if (pt[0] == []){
                       // vertical parallel lines
