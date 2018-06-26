@@ -47,8 +47,8 @@
     document.onmousedown = function(evt){
       function onmousemove(evt) {
         fold = JSON.parse(JSON.stringify(foldBackup));
-//        foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
-//      draw(fold, document.getElementsByTagName('svg')[0]);
+        foldPointToPoint(silhouette[vertexIndex % silhouette.length][0],silhouette[vertexIndex % silhouette.length][1],evt.clientX, evt.clientY, fold, []);
+     draw(fold, document.getElementsByTagName('svg')[0]);
       }
       document.addEventListener('mousemove', onmousemove);
       document.onmouseup = function() {
@@ -67,7 +67,6 @@
     // };
 
     function draw(fold, svg) {
-      console.log('test');
       while(svg.lastChild) {
         svg.removeChild(svg.lastChild);
       }
