@@ -31,8 +31,13 @@
         initFoldFile(fold);
         var history = [];
         silhouette = makeSilhouette(fold);
+<<<<<<< HEAD
         //foldEdgeToEdge(3, 1, fold, history);
         foldPointToPoint(0,0,600,0,fold,history);
+=======
+        foldEdgeToEdge(3, 1, fold, history);
+        //foldEdgeToEdge(3, 1, fold, history);
+>>>>>>> 65b2e7be869dfb58c87ad330608e6494c996bf92
         draw(fold, document.getElementsByTagName('svg')[0]);
         drawHighlight(0);
       }
@@ -53,10 +58,10 @@
         fold = JSON.parse(JSON.stringify(foldBackup));
         silhouette = makeSilhouette(fold);
         //foldPointToPoint(nearestVertex[0],nearestVertex[1],evt.clientX, evt.clientY, fold, []);
-        //draw(fold, document.getElementsByTagName('svg')[0]);   
+        //draw(fold, document.getElementsByTagName('svg')[0]);
       }
       if(nearestVertex != null){
-        document.addEventListener('mousemove', onmousemove);  
+        document.addEventListener('mousemove', onmousemove);
       }
       document.onmouseup = function() {
         document.removeEventListener('mousemove', onmousemove);
@@ -110,7 +115,7 @@
         var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
         rect.setAttribute("x", 0);
         rect.setAttribute("y", 0);
-        rect.setAttribute("width", 600);
+        rect.setAttribute("width", 600);  
         rect.setAttribute("height", 600);
         rect.setAttribute("fill", "none");
         rect.setAttribute("stroke", "black");
@@ -120,6 +125,7 @@
 
     function translate(xShift, yShift, fold) {
       for(var i = 0; i < fold.vertices_coords.length; ++i){
+      console.log('i=' + i);
         fold.vertices_coords[i][0] += xShift;
         fold.vertices_coords[i][1] += yShift;
       }
@@ -162,10 +168,12 @@
                    if (m1 == m2){
                      if (true){// empty intersection:  two different parallel lines
                      if(m1 === 0){
+                      console.log('m1===0');
                        foldPointToPoint(x1, y1, x1, b2, fold, history);
                      }
                      else{
                       if(!isFinite(m1)){
+                      console.log('m1 is infinite', indexEdgeOne);
                        foldPointToPoint(x1, y1, b2, y1, fold, history);
                       }
                        else{
@@ -178,6 +186,7 @@
                     else {
                     if (pt[0] == []){
                       // vertical parallel lines
+                      console.log('vertical parallel lines');
                        foldPointToPoint(x1, y1, x2, y1, fold, history);
                       }
                       else{
@@ -205,9 +214,11 @@
                           var c1 = -2*b2*pt[1]+pt[0]*pt[0]+pt[1]*pt[1]+b2*b2 - c*c;
                               x = (-b3 + Math.sqrt(b3*b3-4*a1*c1))/(2*a1);
                               y = m2*x +b2;
+                              console.log('m1 infinite m2 finite' + indexEdgeOne + IndexEdgeTwo);
                               foldPointToPoint(x2,y2, x, y, fold, history);
                           }
                           else if (!isFinite(m2)){
+                              console.log('m2 infinite', indexEdgeTwo);
                              foldPointToPoint(x2, y2, b2, pt[1] + c, fold, history);
                            }
                            else{
@@ -217,6 +228,7 @@
                              var c2 = pt[0]*pt[0]+pt[1]*pt[1]+b2*b2-2*b2*pt[1]-c*c;
                                  x =(-b4 + Math.sqrt(b4*b4 - 4*a2*c2))/(2*a2);
                                  y = m2*x + b2;
+                                console.log('m1,m2 finite')
                                  foldPointToPoint(x2, y2, x, y, fold, history);
                              }}}}}}}
 
@@ -316,6 +328,7 @@
             var x = (y + m * cord1[0] - cord1[1])/m;
             var x1 = Math.min(cord1[0], cord2[0]);
             var x2 = Math.max(cord1[0], cord2[0]);
+          console.log('isFinite x' +isFinite(x));
             if((x > x1 && x < x2 && x > fold.vertices_coords[vertex][0]) || !isFinite(x)){
               ++count;
             }
@@ -370,6 +383,7 @@
       var m = perpendicularBisector[0];
       var b = perpendicularBisector[1];
       var intersections = findIntersections(m, b, fold);
+    console.log("intersections" + intersections);
       var edgesToNewVertex = new Object();
       var edgesToNewEdges = new Object();
       var faceEdgesToAdd = [];
