@@ -31,7 +31,8 @@
         initFoldFile(fold);
         var history = [];
         silhouette = makeSilhouette(fold);
-        foldEdgeToEdge(3, 1, fold, history);
+        //foldEdgeToEdge(3, 1, fold, history);
+        foldPointToPoint(0,0,600,0,fold,history);
         draw(fold, document.getElementsByTagName('svg')[0]);
         drawHighlight(0);
       }
@@ -173,7 +174,6 @@
                         foldPointToPoint(x1, y1, (b6-b2)/(m1-1/m1), m1*(b6-b2)/(m1-1/m1)+b2, fold, history);
                        }
                       }
-                      console.log(x1 + " " + y1 + " " + (b6-b2)/(m1-1/m1) + " " + m1*(b6-b2)/(m1-1/m1)+b2);
                     }
                     else {
                     if (pt[0] == []){
