@@ -31,8 +31,7 @@
         initFoldFile(fold);
         var history = [];
         silhouette = makeSilhouette(fold);
-        //foldEdgeToEdge(3, 1, fold, history);
-        foldPointToPoint(0,0,600,0,fold,history);
+        //foldPointToPoint(0,0,600,0,fold,history);
         draw(fold, document.getElementsByTagName('svg')[0]);
         drawHighlight(0);
       }
@@ -52,8 +51,8 @@
       function onmousemove(evt) {
         fold = JSON.parse(JSON.stringify(foldBackup));
         silhouette = makeSilhouette(fold);
-        //foldPointToPoint(nearestVertex[0],nearestVertex[1],evt.clientX, evt.clientY, fold, []);
-        //draw(fold, document.getElementsByTagName('svg')[0]);
+        foldPointToPoint(nearestVertex[0],nearestVertex[1],evt.clientX, evt.clientY, fold, []);
+        draw(fold, document.getElementsByTagName('svg')[0]);
       }
       if(nearestVertex != null){
         document.addEventListener('mousemove', onmousemove);
