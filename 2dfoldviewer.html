@@ -388,8 +388,9 @@
         fold.vertices_coords.push(intersections[edge]);
         edgesToNewVertex[edge] = fold.vertices_coords.length - 1;
         fold.edges_vertices.push([fold.edges_vertices[edge][0], edgesToNewVertex[edge]]);
-      //  fold.edges_vertices.push([fold.edges_vertices[edge][1], edgesToNewVertex[edge]]);
-        fold.edges_vertices.push([edgestoNewVertex[edge], fold.edges_vertices[edge][1]]);
+        fold.edges_vertices.push([fold.edges_vertices[edge][1], edgesToNewVertex[edge]]);
+      //  fold.edges_vertices.push([edgestoNewVertex[edge], fold.edges_vertices[edge][1]]);
+        console.log('add edges' + [fold.edges_vertices[edge[0], edgesToNewVertex[edge]] + [fold.edges_vertices[edge][1],edgesToNewVertex[edge]]);
         edgesToNewEdges[edge] = [fold.edges_vertices.length - 2, fold.edges_vertices.length - 1];
         edgesToRemove.push(edge);
       }
@@ -408,7 +409,7 @@
           break;
         }
         var newFaceEdges = [[],[]];
-        var newFaceVertices = [[],[]];
+        var newFaceVertices = [[],[]];/
         var currentFace = 0;
         for(var j = 0; j < fold.faces_edges[i].length; ++j){
           if(fold.faces_edges[i][j] in intersections){
