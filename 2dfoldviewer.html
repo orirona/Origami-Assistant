@@ -119,7 +119,6 @@
 
     function translate(xShift, yShift, fold) {
       for(var i = 0; i < fold.vertices_coords.length; ++i){
-    //  console.log('i=' + i);
         fold.vertices_coords[i][0] += xShift;
         fold.vertices_coords[i][1] += yShift;
       }
@@ -409,7 +408,7 @@
           break;
         }
         var newFaceEdges = [[],[]];
-        var newFaceVertices = [[],[]];/
+        var newFaceVertices = [[],[]];
         var currentFace = 0;
         for(var j = 0; j < fold.faces_edges[i].length; ++j){
           if(fold.faces_edges[i][j] in intersections){
