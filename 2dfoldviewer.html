@@ -389,7 +389,7 @@
         edgesToNewVertex[edge] = fold.vertices_coords.length - 1;
         fold.edges_vertices.push([fold.edges_vertices[edge][0], edgesToNewVertex[edge]]);
       //  fold.edges_vertices.push([fold.edges_vertices[edge][1], edgesToNewVertex[edge]]);
-        fold.edges_vertices.push(edgestoNewVertex[edge], fold.edges_vertices[edge][1]);
+        fold.edges_vertices.push([edgestoNewVertex[edge], fold.edges_vertices[edge][1]]);
         edgesToNewEdges[edge] = [fold.edges_vertices.length - 2, fold.edges_vertices.length - 1];
         edgesToRemove.push(edge);
       }
